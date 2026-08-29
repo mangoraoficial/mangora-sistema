@@ -154,3 +154,48 @@ async function cloudCriarPedido(pedido,itens,auth=false){
 
   return Array.isArray(resposta) ? resposta[0] : resposta;
 }
+
+
+// ==========================================================
+// V18 CLOUD ETAPA 3 - CLIENTES, DESPESAS E MATÉRIA-PRIMA
+// ==========================================================
+async function cloudLerClientes(){
+  const rows=await mangoraRequest('/rest/v1/clientes?select=*&order=nome.asc',{auth:true});
+  return (rows||[]).map(r=>({id:Number(r.id),nome:r.nome||'',telefone:r.telefone||'',endereco:r.endereco||'',data:r.criado_em||''}));
+}
+async function cloudCriarCliente(c){
+  return mangoraRequest('/rest/v1/clientes',{method:'POST',auth:true,prefer:'return=representation',body:[{nome:c.nome,telefone:c.telefone||null,endereco:c.endereco||null}]});
+}
+async function cloudExcluirCliente(id){
+  return mangoraRequest(`/rest/v1/clientes?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',auth:true,prefer:'return=minimal'});
+}
+
+async function cloudLerDespesas(){
+  const rows=await mangoraRequest('/rest/v1/despesas?select=*&order=criado_em.desc',{auth:true});
+  return (rows||[]).map(r=>({id:Number(r.id),nome:r.descricao||'',valor:Number(r.valor||0),data:r.criado_em||''}));
+}
+async function cloudCriarDespesa(d){
+  return mangoraRequest('/rest/v1/despesas',{method:'POST',auth:true,prefer:'return=representation',body:[{descricao:d.nome,valor:Number(d.valor||0)}]});
+}
+async function cloudExcluirDespesa(id){
+  return mangoraRequest(`/rest/v1/despesas?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',auth:true,prefer:'return=minimal'});
+}
+
+async function cloudLerMateriasPrimas(){
+  const rows=await mangoraRequest('/rest/v1/materias_primas?select=*&order=nome.asc',{auth:true});
+  return (rows||[]).map(r=>({
+    id:Number(r.id), nome:r.nome||'', tipo:r.tipo||'',
+    quantidadeCompra:Number(r.quantidade||0), unidadeCompra:r.unidade||'un',
+    valorCompra:Number(r.valor_pago||0), unidadeBase:mpBase(r.unidade||'un'),
+    custoBase:Number(r.custo_base||0), data:r.criado_em||''
+  }));
+}
+async function cloudCriarMateriaPrima(m){
+  return mangoraRequest('/rest/v1/materias_primas',{method:'POST',auth:true,prefer:'return=representation',body:[{
+    nome:m.nome,tipo:m.tipo||null,quantidade:Number(m.quantidadeCompra||0),unidade:m.unidadeCompra||null,
+    valor_pago:Number(m.valorCompra||0),custo_base:Number(m.custoBase||0)
+  }]});
+}
+async function cloudExcluirMateriaPrima(id){
+  return mangoraRequest(`/rest/v1/materias_primas?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',auth:true,prefer:'return=minimal'});
+}

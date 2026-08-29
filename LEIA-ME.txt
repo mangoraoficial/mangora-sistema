@@ -111,3 +111,16 @@ NESTA ETAPA AINDA PERMANECEM LOCAIS:
 - backup legado/local
 
 Esses módulos serão migrados na etapa seguinte.
+
+
+=========================================================
+MANGORA V18 CLOUD - ETAPA 3
+=========================================================
+- Clientes administrativos agora ficam no Supabase.
+- Despesas agora ficam no Supabase.
+- Matérias-primas agora ficam no Supabase.
+- Financeiro passa a usar despesas sincronizadas da nuvem.
+- Pedido manual usa a lista de clientes sincronizada.
+- Pedidos, preços, configuração e autenticação da Etapa 2 foram preservados.
+
+Antes de publicar, execute SUPABASE-ETAPA3.sql no SQL Editor e aguarde Success.

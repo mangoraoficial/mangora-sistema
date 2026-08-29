@@ -244,3 +244,91 @@ window.addEventListener("focus",()=>{
 });
 
 document.addEventListener("DOMContentLoaded",iniciarMangoraCloudAdmin);
+
+
+// ==========================================================
+// V18 CLOUD ETAPA 3 - MÓDULOS ADMINISTRATIVOS NA NUVEM
+// ==========================================================
+async function sincronizarAdministrativoCloud(){
+  const [listaClientes,listaDespesas,listaMaterias]=await Promise.all([
+    cloudLerClientes(),cloudLerDespesas(),cloudLerMateriasPrimas()
+  ]);
+  clientes=listaClientes;
+  despesas=listaDespesas;
+  materiasPrimas=listaMaterias;
+  localStorage.setItem('mangora_clientes',JSON.stringify(clientes));
+  localStorage.setItem('mangora_despesas',JSON.stringify(despesas));
+  localStorage.setItem('mangora_materias_primas',JSON.stringify(materiasPrimas));
+  listarClientes();carregarClientes();listarDespesas();listarMateriaPrima();
+  atualizarDashboard();atualizarFinanceiro();renderizarPedidoManual();
+}
+
+window.salvarCliente=async function(){
+  const nome=document.getElementById('clienteNome').value.trim();
+  const telefone=document.getElementById('clienteTelefone').value.trim();
+  const endereco=document.getElementById('clienteEndereco').value.trim();
+  if(!nome){alert('Informe o nome do cliente.');return;}
+  try{
+    await cloudCriarCliente({nome,telefone,endereco});
+    document.getElementById('clienteNome').value='';
+    document.getElementById('clienteTelefone').value='';
+    document.getElementById('clienteEndereco').value='';
+    await sincronizarAdministrativoCloud();
+  }catch(erro){alert(`Não foi possível salvar o cliente.\n\n${erro.message}`);}
+};
+window.excluirCliente=async function(id){
+  if(!confirm('Excluir este cliente?'))return;
+  try{await cloudExcluirCliente(id);await sincronizarAdministrativoCloud();}
+  catch(erro){alert(`Não foi possível excluir o cliente.\n\n${erro.message}`);}
+};
+
+window.salvarDespesa=async function(){
+  const nome=document.getElementById('despesaNome').value.trim();
+  const valor=Number(document.getElementById('despesaValor').value||0);
+  if(!nome||valor<=0){alert('Informe descrição e valor.');return;}
+  try{
+    await cloudCriarDespesa({nome,valor});
+    document.getElementById('despesaNome').value='';
+    document.getElementById('despesaValor').value='';
+    await sincronizarAdministrativoCloud();
+  }catch(erro){alert(`Não foi possível salvar a despesa.\n\n${erro.message}`);}
+};
+window.excluirDespesa=async function(id){
+  if(!confirm('Excluir esta despesa?'))return;
+  try{await cloudExcluirDespesa(id);await sincronizarAdministrativoCloud();}
+  catch(erro){alert(`Não foi possível excluir a despesa.\n\n${erro.message}`);}
+};
+
+window.salvarMateriaPrima=async function(){
+  const nome=document.getElementById('mpNome').value.trim();
+  const tipo=document.getElementById('mpTipo').value;
+  const q=Number(document.getElementById('mpQuantidadeCompra').value||0);
+  const u=document.getElementById('mpUnidadeCompra').value;
+  const v=Number(document.getElementById('mpValorCompra').value||0);
+  if(!nome||q<=0||v<=0){alert('Informe nome, quantidade e valor pago.');return;}
+  const m={nome,tipo,quantidadeCompra:q,unidadeCompra:u,valorCompra:v,custoBase:v/mpQtdBase(q,u)};
+  try{
+    await cloudCriarMateriaPrima(m);
+    document.getElementById('mpNome').value='';
+    document.getElementById('mpQuantidadeCompra').value='';
+    document.getElementById('mpValorCompra').value='';
+    await sincronizarAdministrativoCloud();
+  }catch(erro){alert(`Não foi possível salvar a matéria-prima.\n\n${erro.message}`);}
+};
+window.excluirMateriaPrima=async function(id){
+  if(!confirm('Excluir esta matéria-prima?'))return;
+  try{await cloudExcluirMateriaPrima(id);await sincronizarAdministrativoCloud();}
+  catch(erro){alert(`Não foi possível excluir a matéria-prima.\n\n${erro.message}`);}
+};
+
+// Complementa a inicialização da Etapa 2 sem alterar os módulos já validados.
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>sincronizarAdministrativoCloud().catch(erro=>{
+    console.error('Falha módulos administrativos cloud:',erro);
+    atualizarIndicadorCloud(false,'Cloud parcial');
+  }),250);
+});
+
+window.addEventListener('focus',()=>{
+  sincronizarAdministrativoCloud().catch(()=>{});
+});
