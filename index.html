@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mangora - Painel da Loja</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-body">
+
+  <aside class="sidebar">
+    <div class="brand-box">
+      <img src="img/logo.png" alt="Mangora Frutas Temperadas" class="brand-logo">
+    </div>
+
+    <nav class="side-nav">
+      <button class="nav-btn ativo" data-tela="dashboard" onclick="mostrarTela('dashboard', this)">🏠 Dashboard</button>
+      <button class="nav-btn" data-tela="novopedido" onclick="mostrarTela('novopedido', this)">➕ Novo pedido</button>
+      <button class="nav-btn" data-tela="pedidos" onclick="mostrarTela('pedidos', this)">🧾 Pedidos</button>
+      <button class="nav-btn" data-tela="cozinha" onclick="mostrarTela('cozinha', this)">👨‍🍳 Cozinha</button>
+      <button class="nav-btn" data-tela="clientes" onclick="mostrarTela('clientes', this)">👥 Clientes</button>
+      <button class="nav-btn" data-tela="produtos" onclick="mostrarTela('produtos', this)">📦 Produtos</button>
+      <button class="nav-btn" data-tela="materiaprima" onclick="mostrarTela('materiaprima', this)">🧺 Matéria-prima</button>
+      <button class="nav-btn" data-tela="financeiro" onclick="mostrarTela('financeiro', this)">💰 Financeiro</button>
+      <button class="nav-btn" data-tela="backup" onclick="mostrarTela('backup', this)">💾 Backup</button>
+    </nav>
+
+    <div class="sidebar-footer">
+      Frescas • Naturais • Irresistíveis
+    </div>
+  </aside>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-copy">
+        <span class="topbar-eyebrow">MANGORA • OPERAÇÃO DA LOJA</span>
+        <h1>Painel Mangora</h1>
+        <p>Pedidos, produção, clientes e gestão em um só lugar.</p>
+      </div>
+      <div class="topbar-actions">
+        <span class="versao-pill">V18 CLOUD • ETAPA 2</span>
+        <span id="statusCloud" class="status-cloud">Conectando Cloud...</span>
+        <a class="link-cliente" href="cliente.html">Abrir área do cliente</a>
+        <button class="btn-sair-cloud" onclick="sairMangora()">Sair</button>
+      </div>
+    </header>
+
+    <main>
+
+      <section id="dashboard" class="tela">
+        <div class="section-heading">
+          <div>
+            <span class="section-kicker">VISÃO GERAL</span>
+            <h2>Dashboard</h2>
+            <p>Acompanhe os principais números e os pedidos mais recentes.</p>
+          </div>
+        </div>
+
+        <div class="cards dashboard-cards">
+          <div class="card dashboard-card card-pedidos">
+            <span>Pedidos</span>
+            <strong id="dashPedidos">0</strong>
+          </div>
+
+          <div class="card laranja dashboard-card card-vendas">
+            <span>Vendas</span>
+            <strong id="dashVendas">R$ 0,00</strong>
+          </div>
+
+          <div class="card amarelo dashboard-card card-clientes">
+            <span>Clientes</span>
+            <strong id="dashClientes">0</strong>
+          </div>
+
+          <div class="card dashboard-card card-destaque">
+            <span>Mais vendido</span>
+            <strong id="dashProduto">Nenhum</strong>
+          </div>
+        </div>
+
+        <div class="bloco">
+          <div class="bloco-topo">
+            <h3>Pedidos recentes</h3>
+            <button class="btn-secundario" onclick="mostrarTela('pedidos')">Ver todos</button>
+          </div>
+          <div class="tabela-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pedido</th>
+                  <th>Cliente</th>
+                  <th>Status</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaRecentes"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      
+      
+      <section id="produtos" class="tela oculto">
+        <h2>Produtos</h2>
+
+        <div class="seletor-produtos-admin">
+          <button id="btnProdutosCarte" class="produto-tipo-btn ativo" onclick="abrirTipoProduto('carte')">
+            <strong>🍍 À la Carte</strong>
+            <span>Receitas prontas, composição e preços.</span>
+          </button>
+
+          <button id="btnProdutosMonte" class="produto-tipo-btn" onclick="abrirTipoProduto('monte')">
+            <strong>🥭 Monte do Seu Jeito</strong>
+            <span>Tamanhos, adicionais e ingredientes disponíveis.</span>
+          </button>
+        </div>
+
+        <div id="produtosCarteAdmin">
+          <div class="bloco">
+            <div class="cabecalho-bloco-produto">
+              <div>
+                <h3>Cardápio À la Carte</h3>
+                <p class="texto-suave">As 9 receitas oficiais da Mangora. Defina os preços de 400 ml e 500 ml quando desejar.</p>
+              </div>
+            </div>
+
+            <div class="receitas-admin">
+              <div class="receita-admin"><strong>🥭 Mangora Clássico</strong><span>Manga + limão + sal rosa</span></div>
+              <div class="receita-admin"><strong>🌶️ Mangora Mexicano</strong><span>Manga + abacaxi + Chamoy + Tajín</span></div>
+              <div class="receita-admin"><strong>🍋 Mangora Fresh</strong><span>Manga + abacaxi + sal rosa + limão + Lemon Pepper</span></div>
+              <div class="receita-admin"><strong>🔥 Mangora Picante</strong><span>Manga + abacaxi + limão + pimenta em pó + sal rosa + páprica picante</span></div>
+              <div class="receita-admin"><strong>🥝 Mangora Tropical</strong><span>Kiwi + morango + abacaxi + limão + mel + sal</span></div>
+              <div class="receita-admin"><strong>🍓 Mangora Tentação</strong><span>Morango + creme Ninho + creme de chocolate</span></div>
+              <div class="receita-admin"><strong>👑 Mangora dos Deuses</strong><span>Manga + morango + kiwi + creme Ninho + creme de chocolate</span></div>
+              <div class="receita-admin"><strong>🌿 Mangora Fit</strong><span>Morango + kiwi + manga + iogurte natural + mel</span></div>
+              <div class="receita-admin"><strong>💛 Mangora Paixão</strong><span>Morango + kiwi + manga + creme de maracujá</span></div>
+            </div>
+          </div>
+
+          <div class="bloco">
+            <h3>Preços do À la Carte</h3>
+            <p class="texto-suave">Os valores podem continuar em branco por enquanto.</p>
+            <div id="precosCarteAdmin" class="precos-carte-admin"></div>
+            <button onclick="salvarPrecosCarte()">Salvar preços do À la Carte</button>
+          </div>
+        </div>
+
+        <div id="produtosMonteAdmin" style="display:none;">
+          <div class="bloco">
+            <h3>Preços e adicionais</h3>
+            <p class="texto-suave">Configure os dois tamanhos e os valores cobrados quando o cliente ultrapassar os itens inclusos.</p>
+
+            <div class="formulario">
+              <input id="preco400" type="number" step="0.01" placeholder="Preço 400 ml">
+              <input id="preco500" type="number" step="0.01" placeholder="Preço 500 ml">
+              <input id="adicionalFruta" type="number" step="0.01" placeholder="Fruta adicional">
+              <input id="adicionalTempero" type="number" step="0.01" placeholder="Tempero adicional">
+              <input id="adicionalCobertura" type="number" step="0.01" placeholder="Cobertura adicional">
+              <button onclick="salvarConfiguracaoMonte()">Salvar configuração</button>
+            </div>
+          </div>
+
+          <div class="cards">
+            <div class="card"><span>Frutas inclusas</span><strong>Até 2</strong></div>
+            <div class="card laranja"><span>Temperos inclusos</span><strong>Até 3</strong></div>
+            <div class="card amarelo"><span>Coberturas inclusas</span><strong>Até 2</strong></div>
+          </div>
+
+          <div class="bloco opcoes-resumo">
+            <div>
+              <strong>Frutas</strong>
+              <p>Manga • Abacaxi • Morango • Kiwi</p>
+            </div>
+            <div>
+              <strong>Temperos</strong>
+              <p>Chamoy • Tajín • Limão • Pimenta em pó • Sal rosa • Lemon Pepper • Páprica doce • Páprica picante</p>
+            </div>
+            <div>
+              <strong>Coberturas</strong>
+              <p>Leite condensado • Mel • Creme Ninho • Iogurte natural • Creme de chocolate • Creme de maracujá</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+<section id="clientes" class="tela oculto">
+        <h2>Clientes</h2>
+
+        <div class="formulario">
+          <input id="clienteNome" placeholder="Nome">
+          <input id="clienteTelefone" placeholder="WhatsApp">
+          <input id="clienteEndereco" placeholder="Endereço">
+          <button onclick="salvarCliente()">Salvar cliente</button>
+        </div>
+
+        <div class="tabela-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Endereço</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaClientes"></tbody>
+          </table>
+        </div>
+      </section>
+
+            <section id="novopedido" class="tela oculto">
+        <div class="titulo-tela-flex">
+          <div>
+            <h2>Novo pedido</h2>
+            <p class="texto-suave">Registre pedidos recebidos por telefone, WhatsApp, balcão ou mesa/comanda.</p>
+          </div>
+        </div>
+
+        <div class="bloco">
+          <h3>Novo pedido manual</h3>
+          <p class="texto-suave">Para pedidos recebidos por telefone, WhatsApp, balcão ou atendimento em mesa.</p>
+
+          <div class="tipo-atendimento-manual">
+            <button id="btnManualDelivery" class="tipo-manual ativo" onclick="selecionarAtendimentoManual('Delivery')">🛵 Delivery</button>
+            <button id="btnManualMesa" class="tipo-manual" onclick="selecionarAtendimentoManual('Mesa/Comanda')">🍽️ Mesa / Comanda</button>
+          </div>
+
+          <div id="dadosDeliveryManual" class="formulario">
+            <select id="clientePedido"><option value="">Cliente cadastrado (opcional)</option></select>
+            <input id="manualNome" placeholder="Nome do cliente">
+            <input id="manualTelefone" placeholder="WhatsApp">
+            <input id="manualEndereco" placeholder="Endereço para entrega">
+          </div>
+
+          <div id="dadosMesaManual" class="formulario" style="display:none;">
+            <input id="manualComanda" placeholder="Mesa / Comanda (ex.: Mesa 04)">
+            <input id="manualNomeMesa" placeholder="Nome do cliente (opcional)">
+          </div>
+
+          <h4 class="subtitulo-manual">Escolha os produtos</h4>
+          <div class="seletor-produto-manual">
+            <button id="btnManualCarte" class="produto-tipo-btn ativo" onclick="abrirProdutoManual('carte')"><strong>🍍 À la Carte</strong><span>Receitas prontas</span></button>
+            <button id="btnManualMonte" class="produto-tipo-btn" onclick="abrirProdutoManual('monte')"><strong>🥭 Monte do Seu Jeito</strong><span>Pedido personalizado</span></button>
+          </div>
+
+          <div id="manualCarte">
+            <div id="manualReceitas" class="manual-receitas"></div>
+          </div>
+
+          <div id="manualMonte" style="display:none;">
+            <div class="formulario">
+              <select id="manualMonteTamanho"><option value="400">400 ml</option><option value="500">500 ml</option></select>
+            </div>
+            <div class="manual-grupo"><strong>Frutas — escolha até 2 inclusas</strong><div id="manualFrutas" class="chips-manual"></div></div>
+            <div class="manual-grupo"><strong>Temperos — escolha até 3 inclusos</strong><div id="manualTemperos" class="chips-manual"></div></div>
+            <div class="manual-grupo"><strong>Coberturas — escolha até 2 inclusas</strong><div id="manualCoberturas" class="chips-manual"></div></div>
+            <div id="manualMontePreco" class="preco-manual">Preço a definir</div>
+            <button onclick="adicionarMonteManual()">Adicionar Monte do Seu Jeito</button>
+          </div>
+
+          <div class="tabela-wrap carrinho-manual-wrap">
+            <table>
+              <thead><tr><th>Produto</th><th>Quantidade</th><th>Total</th><th>Ação</th></tr></thead>
+              <tbody id="tabelaCarrinho"></tbody>
+            </table>
+          </div>
+
+          <div class="final-pedido">
+            <h3 id="totalCarrinho">Total: R$ 0,00</h3>
+            <select id="pagamentoPedido"><option value="Pix">Pix</option><option value="Dinheiro">Dinheiro</option><option value="Cartão">Cartão</option></select>
+            <input id="observacaoManual" placeholder="Observação do pedido (opcional)">
+            <button onclick="finalizarPedido()">Registrar pedido</button>
+          </div>
+        </div>
+
+
+      </section>
+
+      <section id="pedidos" class="tela oculto">
+        <div class="titulo-tela-flex">
+          <div>
+            <h2>Pedidos</h2>
+            <p class="texto-suave">Consulte os pedidos da loja por tipo de atendimento.</p>
+          </div>
+        </div>
+
+        <div class="filtros-pedidos">
+          <button id="filtroTodos" class="filtro-pedido ativo" onclick="filtrarPedidos('todos')">
+            Todos <span id="qtdTodosPedidos">0</span>
+          </button>
+          <button id="filtroDelivery" class="filtro-pedido" onclick="filtrarPedidos('delivery')">
+            🛵 Delivery <span id="qtdDeliveryPedidos">0</span>
+          </button>
+          <button id="filtroMesa" class="filtro-pedido" onclick="filtrarPedidos('mesa')">
+            🍽️ Mesas <span id="qtdMesaPedidos">0</span>
+          </button>
+        </div>
+
+        <div class="bloco">
+          <div class="bloco-topo">
+            <h3 id="tituloListaPedidos">Todos os pedidos</h3>
+          </div>
+          <div class="tabela-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pedido</th>
+                  <th>Atendimento / Cliente</th>
+                  <th>Produtos</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaPedidos"></tbody>
+            </table>
+          </div>
+          <div id="semPedidosFiltro" class="estado-vazio-pedidos" style="display:none;">
+            Nenhum pedido encontrado neste filtro.
+          </div>
+        </div>
+      </section>
+
+<section id="cozinha" class="tela oculto">
+        <h2>Cozinha</h2>
+        <div id="painelCozinha" class="grid-cozinha"></div>
+      </section>
+
+      <section id="materiaprima" class="tela oculto">
+        <h2>Matéria-prima / Custos</h2>
+        <div class="bloco">
+          <p class="texto-suave">Informe quanto comprou e quanto pagou. O sistema calcula o custo por grama, ml ou unidade.</p>
+          <div class="formulario">
+            <input id="mpNome" placeholder="Ex.: Manga, Nutella, Copo 500 ml">
+            <select id="mpTipo"><option>Fruta</option><option>Tempero</option><option>Cobertura</option><option>Embalagem</option><option>Outro</option></select>
+            <input id="mpQuantidadeCompra" type="number" step="0.001" placeholder="Quantidade comprada">
+            <select id="mpUnidadeCompra"><option value="kg">kg</option><option value="g">g</option><option value="L">litro</option><option value="ml">ml</option><option value="un">unidade</option></select>
+            <input id="mpValorCompra" type="number" step="0.01" placeholder="Valor pago">
+            <button onclick="salvarMateriaPrima()">Salvar matéria-prima</button>
+          </div>
+        </div>
+        <div class="bloco"><h3>Custos cadastrados</h3><div class="tabela-wrap"><table>
+          <thead><tr><th>Insumo</th><th>Tipo</th><th>Compra</th><th>Valor pago</th><th>Custo base</th><th>Ação</th></tr></thead>
+          <tbody id="tabelaMateriaPrima"></tbody>
+        </table></div></div>
+      </section>
+
+      
+
+      <section id="financeiro" class="tela oculto">
+        <div class="titulo-tela-flex">
+          <div>
+            <h2>Financeiro</h2>
+            <p class="texto-suave">Vendas válidas, despesas e resultado por período.</p>
+          </div>
+        </div>
+
+        <div class="filtros-financeiro">
+          <button id="finFiltroHoje" class="filtro-fin ativo" onclick="filtrarFinanceiro('hoje')">Hoje</button>
+          <button id="finFiltroSemana" class="filtro-fin" onclick="filtrarFinanceiro('semana')">7 dias</button>
+          <button id="finFiltroMes" class="filtro-fin" onclick="filtrarFinanceiro('mes')">Mês</button>
+          <button id="finFiltroTudo" class="filtro-fin" onclick="filtrarFinanceiro('tudo')">Todo período</button>
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <span id="finLabelVendas">Vendido hoje</span>
+            <strong id="finVendas">R$ 0,00</strong>
+          </div>
+
+          <div class="card laranja">
+            <span id="finLabelDespesas">Despesas hoje</span>
+            <strong id="finDespesas">R$ 0,00</strong>
+          </div>
+
+          <div class="card amarelo">
+            <span id="finLabelResultado">Resultado hoje</span>
+            <strong id="finLucro">R$ 0,00</strong>
+          </div>
+        </div>
+
+        <div class="bloco">
+          <h3>Nova despesa</h3>
+          <div class="formulario">
+            <input id="despesaNome" placeholder="Descrição">
+            <input id="despesaValor" type="number" step="0.01" placeholder="Valor">
+            <button onclick="salvarDespesa()">Salvar despesa</button>
+          </div>
+
+          <div class="tabela-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Descrição</th>
+                  <th>Valor</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaDespesas"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="backup" class="tela oculto">
+        <h2>Backup</h2>
+
+        <div class="bloco">
+          <p class="texto-suave">
+            Exporte uma cópia completa de clientes, pedidos, preços, configurações, matéria-prima e despesas. Para restaurar,
+            escolha um arquivo de backup gerado por este sistema.
+          </p>
+
+          <div class="acoes-backup">
+            <button onclick="exportarBackup()">Exportar backup</button>
+
+            <label class="btn-arquivo">
+              Importar backup
+              <input type="file" accept=".json,application/json" onchange="importarBackup(event)" hidden>
+            </label>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      Mangora Frutas Temperadas © 2026
+    </footer>
+  </div>
+
+  <script src="cloud-config.js"></script>
+  <script src="cloud-auth.js"></script>
+  <script>
+    exigirLoginMangora();
+  </script>
+  <script src="cloud-db.js"></script>
+  <script src="script.js"></script>
+  <script src="cloud-admin.js"></script>
+</body>
+</html>

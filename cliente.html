@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mangora - Faça seu pedido</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="site-cliente">
+
+  <header class="cliente-topo">
+    <img src="img/logo.png" alt="Mangora Frutas Temperadas" class="cliente-logo">
+  </header>
+
+  <section class="hero-cliente">
+    <h1>Faça seu pedido</h1>
+    <p>Escolha seus produtos favoritos e finalize em poucos passos.</p>
+  </section>
+
+  <main class="cliente-main">
+
+    <section><h2>Como você quer pedir?</h2>
+      <div class="modo-pedido">
+        <button class="modo-card ativo" id="btnCarte" onclick="abrirModo('carte')"><strong>🍍 À la Carte</strong><span>Escolha uma das combinações prontas da Mangora.</span></button>
+        <button class="modo-card" id="btnMonte" onclick="abrirModo('monte')"><strong>🥭 Monte do Seu Jeito</strong><span>Escolha tamanho, frutas, temperos e coberturas.</span></button>
+      </div>
+    </section>
+    <section id="areaMonte" class="configurador" style="display:none;"><h2>Monte do Seu Jeito</h2>
+      <div class="passo"><h3>1. Tamanho</h3><label><input type="radio" name="tamanhoMonte" value="400" checked onchange="atualizarResumoMonte()"> 400 ml</label> <label><input type="radio" name="tamanhoMonte" value="500" onchange="atualizarResumoMonte()"> 500 ml</label></div>
+      <div class="passo"><h3>2. Frutas <small>até 2 inclusas</small></h3><div id="opcoesFrutas" class="grade-opcoes"></div></div>
+      <div class="passo"><h3>3. Temperos <small>até 3 inclusos</small></h3><div id="opcoesTemperos" class="grade-opcoes"></div></div>
+      <div class="passo"><h3>4. Coberturas <small>até 2 inclusas</small></h3><div id="opcoesCoberturas" class="grade-opcoes"></div></div>
+      <div class="resumo-monte"><h3>Resumo</h3><div id="resumoMonte"></div><strong id="precoMonte"></strong><button class="cliente-acao" onclick="adicionarMonteCarrinho()">Adicionar ao carrinho</button></div>
+    </section>
+    <section id="areaCarte"><h2>À la Carte</h2><div id="listaProdutos"></div></section>
+
+    <section class="carrinho-box">
+      <h2>🛒 Seu carrinho</h2>
+      <div id="itensCarrinho">
+        <p>Carrinho vazio.</p>
+      </div>
+
+      <h3 id="valorTotal">Total: R$ 0,00</h3>
+
+      <button class="cliente-acao" onclick="abrirFormulario()">Finalizar pedido</button>
+    </section>
+
+    <section id="formPedido" class="form-box" style="display:none;">
+      <h2>Dados do pedido</h2>
+
+      <input id="nome" placeholder="Nome">
+      <input id="telefone" placeholder="WhatsApp">
+      <input id="endereco" placeholder="Endereço">
+
+      <select id="pagamento">
+        <option value="Pix">Pix</option>
+        <option value="Dinheiro">Dinheiro</option>
+        <option value="Cartão">Cartão</option>
+      </select>
+
+      <textarea id="observacao" placeholder="Observações do pedido"></textarea>
+
+      <button class="cliente-acao" onclick="enviarPedido()">Enviar pedido</button>
+    </section>
+
+    <section id="confirmacaoPedido" class="confirmacao-box" style="display:none;">
+      <h2>🥭 Pedido recebido!</h2>
+      <h3 id="numeroPedido"></h3>
+      <div class="status-box" id="statusPedido">🟢 Recebido</div>
+
+      <button class="cliente-acao" style="margin-top:14px;" onclick="acompanharPedido()">
+        Acompanhar meu pedido
+      </button>
+    </section>
+
+  </main>
+
+  <script src="cloud-config.js"></script>
+  <script src="cloud-db.js"></script>
+  <script src="cliente.js"></script>
+  <script src="cloud-cliente.js"></script>
+
+<div id="toastCliente" class="toast-cliente" role="status" aria-live="polite"></div>
+
+<button id="carrinhoFlutuante" class="carrinho-flutuante" onclick="irParaCarrinho()" aria-label="Ir para o carrinho">
+  🛒 <span>Carrinho</span> <strong id="contadorCarrinhoFlutuante">0</strong>
+</button>
+</body>
+</html>

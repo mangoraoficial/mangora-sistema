@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Mangora • Acesso da Loja</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-body">
+  <main class="login-shell">
+    <section class="login-card">
+      <img src="img/logo.png" alt="Mangora Frutas Temperadas" class="login-logo">
+      <span class="login-kicker">ÁREA ADMINISTRATIVA</span>
+      <h1>Acesso da loja</h1>
+      <p>Entre com o usuário autorizado da Mangora.</p>
+
+      <form id="formLogin">
+        <label for="loginEmail">E-mail</label>
+        <input id="loginEmail" type="email" autocomplete="username" required>
+
+        <label for="loginSenha">Senha</label>
+        <input id="loginSenha" type="password" autocomplete="current-password" required>
+
+        <button id="btnLogin" type="submit">Entrar no painel</button>
+        <div id="loginMensagem" class="login-mensagem" role="alert"></div>
+      </form>
+
+      <a class="login-voltar" href="cliente.html">← Ir para a área do cliente</a>
+    </section>
+  </main>
+
+  <script src="cloud-config.js"></script>
+  <script src="cloud-auth.js"></script>
+  <script>
+    (async()=>{
+      const sessao=await obterSessaoValida();
+      if(sessao) location.replace("index.html");
+    })();
+
+    document.getElementById("formLogin").addEventListener("submit",async(e)=>{
+      e.preventDefault();
+      const btn=document.getElementById("btnLogin");
+      const msg=document.getElementById("loginMensagem");
+      const email=document.getElementById("loginEmail").value.trim();
+      const senha=document.getElementById("loginSenha").value;
+
+      btn.disabled=true;
+      btn.textContent="Entrando...";
+      msg.textContent="";
+
+      try{
+        await loginMangora(email,senha);
+        location.replace("index.html");
+      }catch(erro){
+        msg.textContent=erro.message || "Não foi possível entrar.";
+      }finally{
+        btn.disabled=false;
+        btn.textContent="Entrar no painel";
+      }
+    });
+  </script>
+</body>
+</html>

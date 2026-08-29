@@ -1,0 +1,113 @@
+MANGORA V16
+Base: V15.
+
+FOCO: CONFIABILIDADE OPERACIONAL
+
+1. BACKUP COMPLETO
+- Inclui preços do À la Carte (mangora_precos_carte).
+- Inclui controle da sequência diária de pedidos.
+- Mantém compatibilidade com backups antigos.
+
+2. BLOQUEIO DE PEDIDO SEM PREÇO
+- À la Carte sem preço não entra no carrinho.
+- Monte do Seu Jeito sem preço-base não entra no carrinho.
+- Há nova validação também na finalização do pedido.
+- Aplicado ao painel da loja e à área do cliente.
+
+3. NÚMERO DE PEDIDO CURTO
+- Novos pedidos recebem sequência diária: #001, #002, #003...
+- O ID técnico interno continua existindo para preservar compatibilidade.
+- Pedidos antigos continuam funcionando.
+
+4. STATUS CORRETO POR ATENDIMENTO
+Delivery:
+Recebido > Em preparo > Saiu para entrega > Finalizado
+
+Mesa/Comanda:
+Recebido > Em preparo > Pronto > Finalizado
+
+5. WHATSAPP NORMALIZADO
+- Evita duplicar o código 55 quando o telefone já foi salvo com DDI.
+
+6. CANCELAMENTO SEGURO
+- Pedido ativo pode ser cancelado com motivo.
+- Cancelado permanece no histórico.
+- Cancelado sai da cozinha e não entra nos totais financeiros.
+- Exclusão definitiva continua disponível, mas somente depois do cancelamento.
+
+7. FINANCEIRO POR PERÍODO
+- Hoje
+- Últimos 7 dias
+- Mês atual
+- Todo período
+- Pedidos cancelados não entram como venda.
+- Despesas são filtradas pelo mesmo período.
+
+8. DASHBOARD
+- Pedidos e vendas passam a representar o dia atual.
+- Pedidos cancelados ficam fora dos indicadores do dia.
+
+A estrutura principal do localStorage foi preservada para não quebrar os dados existentes.
+
+
+MANGORA V17 - IDENTIDADE VISUAL
+- Mantém integralmente a lógica funcional da V16.
+- Nova paleta baseada na logo Mangora.
+- Verde escuro e verde como base da loja.
+- Verde-lima, amarelo e laranja como destaques.
+- Sidebar da loja em verde institucional.
+- Dashboard com indicadores diferenciados pelas cores da marca.
+- Área do cliente mais viva e comercial.
+- Cards À la Carte com acentos amarelo/laranja/verde.
+- Carrinho destacado em laranja.
+- Formulário destacado em verde.
+- Confirmação destacada em amarelo.
+- Hero do cliente com gradiente verde e detalhes da paleta.
+
+
+MANGORA V18 CLOUD - ETAPA 1
+- Projeto conectado ao Supabase.
+- Project URL configurada.
+- Publishable key configurada.
+- Login administrativo criado usando Supabase Auth.
+- Painel administrativo exige sessão válida.
+- Botão Sair adicionado.
+- Área do cliente permanece pública.
+- A lógica operacional da V17 foi preservada nesta primeira etapa.
+- Próxima etapa: migrar preços, configurações e pedidos do localStorage para o banco Supabase.
+
+IMPORTANTE:
+- Nunca colocar Secret key/service_role nos arquivos do site.
+- Apenas a Publishable key está no front-end.
+
+
+=========================================================
+MANGORA V18 CLOUD - ETAPA 2
+=========================================================
+ANTES DE TESTAR:
+1. Abra o Supabase > SQL Editor > New.
+2. Abra o arquivo SUPABASE-ETAPA2.sql deste pacote.
+3. Copie todo o conteúdo e execute no Supabase.
+4. Aguarde Success.
+5. Depois publique/abra os arquivos desta versão.
+
+NOVIDADES:
+- Preços À la Carte salvos no Supabase.
+- Configuração Monte do Seu Jeito salva no Supabase.
+- Cliente lê preços diretamente da nuvem.
+- Pedido do cliente é gravado diretamente no Supabase.
+- Pedido manual da loja também é gravado no Supabase.
+- Painel consulta pedidos do banco a cada 5 segundos.
+- Status e cancelamento são atualizados na nuvem.
+- Exclusão definitiva remove do banco (após cancelamento).
+- Acompanhamento usa token UUID seguro.
+- Numeração de pedidos agora é central no banco.
+- Indicador de conexão Cloud no painel.
+
+NESTA ETAPA AINDA PERMANECEM LOCAIS:
+- cadastro administrativo de clientes
+- despesas
+- matérias-primas
+- backup legado/local
+
+Esses módulos serão migrados na etapa seguinte.

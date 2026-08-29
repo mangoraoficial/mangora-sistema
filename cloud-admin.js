@@ -1,0 +1,246 @@
+// ==========================================================
+// MANGORA V18 CLOUD - PAINEL DA LOJA
+// Supabase como fonte dos pedidos, preços e configuração.
+// ==========================================================
+
+let sincronizacaoCloudEmAndamento=false;
+let intervaloCloud=null;
+
+function atualizarIndicadorCloud(ok,texto){
+  const el=document.getElementById("statusCloud");
+  if(!el)return;
+  el.textContent=texto || (ok?"Cloud conectado":"Cloud indisponível");
+  el.classList.toggle("offline",!ok);
+}
+
+async function sincronizarCatalogoCloudAdmin(){
+  const [precos,cfg]=await Promise.all([
+    cloudLerPrecos(true),
+    cloudLerConfigMonte(true)
+  ]);
+
+  if(precos && Object.keys(precos).length){
+    localStorage.setItem("mangora_precos_carte",JSON.stringify(precos));
+  }
+
+  if(cfg){
+    configuracaoMonte=cfg;
+    localStorage.setItem("mangora_config_monte",JSON.stringify(cfg));
+  }
+
+  renderizarPrecosCarte();
+  carregarConfiguracaoMonte();
+  renderizarPedidoManual();
+}
+
+async function sincronizarPedidosCloud(){
+  if(sincronizacaoCloudEmAndamento)return;
+  sincronizacaoCloudEmAndamento=true;
+
+  try{
+    const lista=await cloudLerPedidos();
+    pedidos=lista.map(normalizarPedido);
+    localStorage.setItem("mangora_pedidos",JSON.stringify(pedidos));
+
+    listarPedidos();
+    listarRecentes();
+    carregarCozinha();
+    atualizarDashboard();
+    atualizarFinanceiro();
+
+    atualizarIndicadorCloud(true,`Cloud conectado • ${pedidos.length} pedido(s)`);
+  }catch(erro){
+    console.error("Falha na sincronização cloud:",erro);
+    atualizarIndicadorCloud(false,"Cloud indisponível");
+  }finally{
+    sincronizacaoCloudEmAndamento=false;
+  }
+}
+
+window.salvarPrecosCarte=async function(){
+  const p={};
+  receitasCarteAdmin.forEach(([id])=>{
+    p[id]={
+      p400:Number(document.getElementById(`carte_${id}_400`).value||0),
+      p500:Number(document.getElementById(`carte_${id}_500`).value||0)
+    };
+  });
+
+  try{
+    await cloudSalvarPrecos(p);
+    localStorage.setItem("mangora_precos_carte",JSON.stringify(p));
+    renderizarPedidoManual();
+    alert("Preços salvos na nuvem.");
+  }catch(erro){
+    alert(`Não foi possível salvar os preços.\n\n${erro.message}`);
+  }
+};
+
+window.salvarConfiguracaoMonte=async function(){
+  const cfg={
+    preco400:Number(document.getElementById("preco400").value||0),
+    preco500:Number(document.getElementById("preco500").value||0),
+    adicionalFruta:Number(document.getElementById("adicionalFruta").value||0),
+    adicionalTempero:Number(document.getElementById("adicionalTempero").value||0),
+    adicionalCobertura:Number(document.getElementById("adicionalCobertura").value||0)
+  };
+
+  try{
+    await cloudSalvarConfigMonte(cfg);
+    configuracaoMonte=cfg;
+    localStorage.setItem("mangora_config_monte",JSON.stringify(cfg));
+    renderizarPedidoManual();
+    alert("Configuração salva na nuvem.");
+  }catch(erro){
+    alert(`Não foi possível salvar a configuração.\n\n${erro.message}`);
+  }
+};
+
+window.finalizarPedido=async function(){
+  if(carrinho.length===0){alert("Adicione produtos ao pedido.");return;}
+  if(carrinho.some(i=>Number(i.preco||0)<=0 || Number(i.total||0)<=0)){
+    alert("Há item sem preço definido no carrinho.");
+    return;
+  }
+
+  let nome="",telefone="",endereco="",comanda="";
+  if(atendimentoManual==="Delivery"){
+    const clienteId=document.getElementById("clientePedido").value;
+    const cliente=clientes.find(c=>c.id==clienteId);
+    nome=document.getElementById("manualNome").value.trim()||cliente?.nome||"";
+    telefone=document.getElementById("manualTelefone").value.trim()||cliente?.telefone||"";
+    endereco=document.getElementById("manualEndereco").value.trim()||cliente?.endereco||"";
+    if(!nome){alert("Informe o nome do cliente.");return;}
+    if(!endereco){alert("Informe o endereço para entrega.");return;}
+  }else{
+    comanda=document.getElementById("manualComanda").value.trim();
+    nome=document.getElementById("manualNomeMesa").value.trim()||"Cliente";
+    if(!comanda){alert("Informe a mesa ou comanda.");return;}
+  }
+
+  const total=carrinho.reduce((s,i)=>s+Number(i.total||0),0);
+  const pagamento=document.getElementById("pagamentoPedido").value;
+  const observacao=document.getElementById("observacaoManual").value.trim();
+
+  const dadosPedido={
+    cliente_nome:nome,telefone,endereco,
+    tipo_atendimento:atendimentoManual,
+    comanda,pagamento,observacao,
+    origem:"Pedido Manual",total
+  };
+
+  const itens=carrinho.map(i=>({
+    nome:i.nome,
+    receita_id:i.receitaId||null,
+    tamanho:i.tamanho||i.montagem?.tamanho||null,
+    detalhes:i.detalhes||"",
+    preco:Number(i.preco||0),
+    quantidade:Number(i.quantidade||1),
+    total:Number(i.total||0),
+    personalizado:Boolean(i.personalizado),
+    alacarte:Boolean(i.alacarte)
+  }));
+
+  try{
+    await cloudCriarPedido(dadosPedido,itens,true);
+    carrinho=[];
+    ["manualNome","manualTelefone","manualEndereco","manualComanda","manualNomeMesa","observacaoManual"].forEach(id=>{
+      const e=document.getElementById(id);if(e)e.value="";
+    });
+    mostrarCarrinho();
+    await sincronizarPedidosCloud();
+    alert(`Pedido ${atendimentoManual} registrado na nuvem.`);
+
+    const botaoPedidos=document.querySelector('.nav-btn[data-tela="pedidos"]');
+    if(botaoPedidos) mostrarTela("pedidos",botaoPedidos);
+    filtrarPedidos(atendimentoManual==="Mesa/Comanda"?"mesa":"delivery");
+  }catch(erro){
+    alert(`Não foi possível registrar o pedido.\n\n${erro.message}`);
+  }
+};
+
+window.alterarStatus=async function(id){
+  const pedido=pedidos.find(p=>p.id==id);
+  if(!pedido||pedidoCancelado(pedido))return;
+
+  const mesa=tipoPedidoPainel(pedido)==="mesa";
+  const fluxo=mesa
+    ?["Recebido","Em preparo","Pronto","Finalizado"]
+    :["Recebido","Em preparo","Saiu para entrega","Finalizado"];
+  const indice=fluxo.indexOf(pedido.status);
+  const novo=indice>=0&&indice<fluxo.length-1?fluxo[indice+1]:"Finalizado";
+
+  try{
+    await mangoraRequest(`/rest/v1/pedidos?id=eq.${encodeURIComponent(id)}`,{
+      method:"PATCH",auth:true,body:{status:novo},prefer:"return=minimal"
+    });
+    await sincronizarPedidosCloud();
+  }catch(erro){
+    alert(`Não foi possível alterar o status.\n\n${erro.message}`);
+  }
+};
+
+window.cancelarPedido=async function(id){
+  const pedido=pedidos.find(p=>p.id==id);
+  if(!pedido||pedidoCancelado(pedido))return;
+
+  const motivo=prompt(`Cancelar o pedido ${referenciaPedido(pedido)}?\n\nInforme o motivo do cancelamento:`);
+  if(motivo===null)return;
+  if(!motivo.trim()){alert("Informe o motivo do cancelamento.");return;}
+
+  try{
+    await mangoraRequest(`/rest/v1/pedidos?id=eq.${encodeURIComponent(id)}`,{
+      method:"PATCH",
+      auth:true,
+      body:{
+        status:"Cancelado",
+        motivo_cancelamento:motivo.trim(),
+        cancelado_em:new Date().toISOString()
+      },
+      prefer:"return=minimal"
+    });
+    await sincronizarPedidosCloud();
+  }catch(erro){
+    alert(`Não foi possível cancelar o pedido.\n\n${erro.message}`);
+  }
+};
+
+window.excluirPedido=async function(id){
+  const pedido=pedidos.find(p=>p.id==id);
+  if(!pedido)return;
+  if(!pedidoCancelado(pedido)){
+    alert("Por segurança, primeiro cancele o pedido.");
+    return;
+  }
+
+  if(!confirm(`Excluir definitivamente o pedido ${referenciaPedido(pedido)}?\n\nEsta ação não poderá ser desfeita.`))return;
+
+  try{
+    await mangoraRequest(`/rest/v1/pedidos?id=eq.${encodeURIComponent(id)}`,{
+      method:"DELETE",auth:true,prefer:"return=minimal"
+    });
+    await sincronizarPedidosCloud();
+  }catch(erro){
+    alert(`Não foi possível excluir o pedido.\n\n${erro.message}`);
+  }
+};
+
+async function iniciarMangoraCloudAdmin(){
+  try{
+    await exigirLoginMangora();
+    await sincronizarCatalogoCloudAdmin();
+    await sincronizarPedidosCloud();
+    if(intervaloCloud)clearInterval(intervaloCloud);
+    intervaloCloud=setInterval(sincronizarPedidosCloud,5000);
+  }catch(erro){
+    console.error(erro);
+    atualizarIndicadorCloud(false,"Falha na conexão Cloud");
+  }
+}
+
+window.addEventListener("focus",()=>{
+  sincronizarCatalogoCloudAdmin().catch(()=>{});
+  sincronizarPedidosCloud();
+});
+
+document.addEventListener("DOMContentLoaded",iniciarMangoraCloudAdmin);

@@ -1,0 +1,117 @@
+// ==========================================================
+// MANGORA V18 CLOUD - ÁREA DO CLIENTE
+// Preços + configuração + envio real para Supabase
+// ==========================================================
+
+let ultimoTrackingTokenCloud=null;
+
+async function carregarCatalogoCloudCliente(){
+  try{
+    const [precos,cfg]=await Promise.all([
+      cloudLerPrecos(false),
+      cloudLerConfigMonte(false)
+    ]);
+
+    localStorage.setItem("mangora_precos_carte",JSON.stringify(precos||{}));
+
+    if(cfg){
+      localStorage.setItem("mangora_config_monte",JSON.stringify(cfg));
+    }
+
+    renderizarCarte();
+    renderizarOpcoesMonte();
+    atualizarResumoMonte();
+  }catch(erro){
+    console.error("Falha ao carregar catálogo cloud:",erro);
+    alert("Não foi possível carregar o cardápio online. Verifique sua internet e tente novamente.");
+  }
+}
+
+window.onload=async function(){
+  produtos=lerProdutos();
+  carregarProdutos();
+  renderizarOpcoesMonte();
+  atualizarCarrinho();
+  await carregarCatalogoCloudCliente();
+};
+
+window.enviarPedido=async function(){
+  const nome=document.getElementById("nome").value.trim();
+  const telefone=document.getElementById("telefone").value.trim();
+  const endereco=document.getElementById("endereco").value.trim();
+  const pagamento=document.getElementById("pagamento").value;
+  const observacao=document.getElementById("observacao").value.trim();
+
+  if(!nome){alert("Informe seu nome.");return;}
+  if(!telefone){alert("Informe seu WhatsApp.");return;}
+  if(!endereco){alert("Informe seu endereço.");return;}
+  if(carrinho.length===0){alert("Seu carrinho está vazio.");return;}
+  if(carrinho.some(i=>Number(i.preco||0)<=0 || Number(i.total||0)<=0)){
+    alert("Há item sem preço válido no carrinho.");
+    return;
+  }
+
+  const botao=document.querySelector('#formPedido button[onclick="enviarPedido()"]');
+  if(botao){botao.disabled=true;botao.textContent="Enviando pedido...";}
+
+  const total=carrinho.reduce((s,i)=>s+Number(i.total||0),0);
+
+  const dadosPedido={
+    cliente_nome:nome,
+    telefone,
+    endereco,
+    tipo_atendimento:"Delivery",
+    pagamento,
+    observacao,
+    origem:"Cliente",
+    total
+  };
+
+  const itens=carrinho.map(i=>({
+    nome:i.nome,
+    receita_id:i.receitaId || i.receita_id || null,
+    tamanho:i.tamanho || i.montagem?.tamanho || null,
+    detalhes:i.detalhes||"",
+    preco:Number(i.preco||0),
+    quantidade:Number(i.quantidade||1),
+    total:Number(i.total||0),
+    personalizado:Boolean(i.personalizado),
+    alacarte:Boolean(i.alacarte)
+  }));
+
+  try{
+    const criado=await cloudCriarPedido(dadosPedido,itens,false);
+    if(!criado?.pedido_id) throw new Error("Pedido não confirmado pelo servidor.");
+
+    ultimoPedido=Number(criado.pedido_id);
+    ultimoTrackingTokenCloud=criado.tracking_token;
+
+    document.getElementById("formPedido").style.display="none";
+    document.getElementById("confirmacaoPedido").style.display="block";
+    document.getElementById("numeroPedido").textContent=
+      `Pedido Nº ${String(criado.numero_pedido||criado.pedido_id).padStart(3,"0")}`;
+    document.getElementById("statusPedido").textContent="🟢 Recebido";
+
+    carrinho=[];
+    atualizarCarrinho();
+
+    ["nome","telefone","endereco","observacao"].forEach(id=>{
+      const el=document.getElementById(id); if(el)el.value="";
+    });
+    document.getElementById("pagamento").selectedIndex=0;
+    document.getElementById("confirmacaoPedido").scrollIntoView({behavior:"smooth",block:"center"});
+  }catch(erro){
+    console.error(erro);
+    alert(`Não foi possível enviar o pedido.\n\n${erro.message}`);
+  }finally{
+    if(botao){botao.disabled=false;botao.textContent="Enviar pedido";}
+  }
+};
+
+window.acompanharPedido=function(){
+  if(!ultimoTrackingTokenCloud){
+    alert("Código de acompanhamento não encontrado.");
+    return;
+  }
+  location.href=`acompanhamento.html?token=${encodeURIComponent(ultimoTrackingTokenCloud)}`;
+};

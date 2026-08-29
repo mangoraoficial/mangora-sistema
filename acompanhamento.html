@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mangora - Acompanhar Pedido</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="site-cliente">
+
+  <header class="cliente-topo">
+    <img src="img/logo.png" alt="Mangora Frutas Temperadas" class="cliente-logo">
+  </header>
+
+  <section class="hero-cliente">
+    <h1>Acompanhe seu pedido</h1>
+    <p>Consulte o status pelo código seguro do seu pedido.</p>
+  </section>
+
+  <main class="cliente-main">
+
+    <section class="acompanhar-box">
+      <h2>Consultar pedido</h2>
+
+      <input id="codigoPedido" placeholder="Código de acompanhamento">
+
+      <button class="cliente-acao" onclick="consultarPedido()">
+        Consultar
+      </button>
+    </section>
+
+    <section id="resultado" class="acompanhar-box" style="display:none;">
+      <h2 id="numeroResultado">Pedido encontrado</h2>
+      <p id="clienteResultado"></p>
+      <div class="status-box" id="statusResultado"></div>
+      <p id="dataResultado" style="margin-top:12px;"></p>
+      <div id="itensResultado" style="margin-top:12px;"></div>
+    </section>
+
+  </main>
+
+  <script src="cloud-config.js"></script>
+  <script src="cloud-db.js"></script>
+  <script src="cloud-acompanhamento.js"></script>
+</body>
+</html>
