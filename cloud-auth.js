@@ -33,6 +33,25 @@ async function loginMangora(email,senha){
     method:"POST",
     body:JSON.stringify({email, password:senha})
   });
+
+  // V18 Etapa 4: além de autenticar, o usuário precisa estar
+  // explicitamente autorizado em public.admin_users.
+  const resposta=await fetch(`${MANGORA_CLOUD.url}/rest/v1/rpc/is_mangora_admin`,{
+    method:"POST",
+    headers:{
+      "apikey":MANGORA_CLOUD.publishableKey,
+      "Authorization":`Bearer ${sessao.access_token}`,
+      "Content-Type":"application/json"
+    },
+    body:"{}"
+  });
+
+  const autorizado=resposta.ok ? await resposta.json() : false;
+  if(autorizado!==true){
+    limparSessao();
+    throw new Error("Usuário sem permissão administrativa.");
+  }
+
   salvarSessao(sessao);
   return sessao;
 }
@@ -65,12 +84,40 @@ async function obterSessaoValida(){
   return sessao;
 }
 
+
+async function usuarioEhAdminMangora(sessao){
+  if(!sessao?.access_token) return false;
+  try{
+    const r=await fetch(`${MANGORA_CLOUD.url}/rest/v1/rpc/is_mangora_admin`,{
+      method:"POST",
+      headers:{
+        "apikey":MANGORA_CLOUD.publishableKey,
+        "Authorization":`Bearer ${sessao.access_token}`,
+        "Content-Type":"application/json"
+      },
+      body:"{}"
+    });
+    if(!r.ok)return false;
+    return (await r.json())===true;
+  }catch(e){
+    return false;
+  }
+}
+
 async function exigirLoginMangora(){
   const sessao=await obterSessaoValida();
   if(!sessao){
     location.replace("login.html");
     return null;
   }
+
+  const autorizado=await usuarioEhAdminMangora(sessao);
+  if(!autorizado){
+    limparSessao();
+    location.replace("login.html?erro=permissao");
+    return null;
+  }
+
   return sessao;
 }
 

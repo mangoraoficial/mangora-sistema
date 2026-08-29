@@ -124,3 +124,19 @@ MANGORA V18 CLOUD - ETAPA 3
 - Pedidos, preços, configuração e autenticação da Etapa 2 foram preservados.
 
 Antes de publicar, execute SUPABASE-ETAPA3.sql no SQL Editor e aguarde Success.
+
+
+=========================================================
+MANGORA V18 CLOUD - ETAPA 4 / FECHAMENTO
+=========================================================
+- Whitelist administrativa via admin_users.
+- Login valida autenticação + autorização administrativa.
+- Acesso anônimo direto às tabelas operacionais revogado.
+- Pedido público continua funcionando via RPC segura.
+- Acompanhamento permanece por token seguro.
+- Importação de backup pelo navegador foi bloqueada na versão Cloud.
+- Impressão térmica e fluxo operacional da Etapa 3 foram preservados.
+- Incluído CHECKLIST-PRODUCAO.txt.
+
+IMPORTANTE:
+Execute SUPABASE-ETAPA4-SEGURANCA.sql ANTES de publicar esta versão.

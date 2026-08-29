@@ -38,7 +38,7 @@
         <p>Pedidos, produção, clientes e gestão em um só lugar.</p>
       </div>
       <div class="topbar-actions">
-        <span class="versao-pill">V18 CLOUD • ETAPA 3</span>
+        <span class="versao-pill">V18 CLOUD • ETAPA 4</span>
         <span id="statusCloud" class="status-cloud">Conectando Cloud...</span>
         <a class="link-cliente" href="cliente.html">Abrir área do cliente</a>
         <button class="btn-sair-cloud" onclick="sairMangora()">Sair</button>
@@ -409,17 +409,14 @@
 
         <div class="bloco">
           <p class="texto-suave">
-            Exporte uma cópia completa de clientes, pedidos, preços, configurações, matéria-prima e despesas. Para restaurar,
-            escolha um arquivo de backup gerado por este sistema.
+            Exporte uma cópia de segurança dos dados sincronizados da operação. Na versão Cloud, a restauração direta pelo navegador
+            fica bloqueada para evitar substituir dados do Supabase acidentalmente.
           </p>
 
           <div class="acoes-backup">
             <button onclick="exportarBackup()">Exportar backup</button>
 
-            <label class="btn-arquivo">
-              Importar backup
-              <input type="file" accept=".json,application/json" onchange="importarBackup(event)" hidden>
-            </label>
+            <button class="btn-secundario" type="button" onclick="alert('Restauração Cloud protegida. Guarde o arquivo exportado; a restauração deve ser feita de forma controlada no Supabase.')">Restauração protegida</button>
           </div>
         </div>
       </section>

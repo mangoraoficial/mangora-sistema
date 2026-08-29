@@ -33,8 +33,12 @@
   <script src="cloud-auth.js"></script>
   <script>
     (async()=>{
+      const erro=new URLSearchParams(location.search).get("erro");
+      if(erro==="permissao"){
+        document.getElementById("loginMensagem").textContent="Este usuário não possui permissão administrativa.";
+      }
       const sessao=await obterSessaoValida();
-      if(sessao) location.replace("index.html");
+      if(sessao && await usuarioEhAdminMangora(sessao)) location.replace("index.html");
     })();
 
     document.getElementById("formLogin").addEventListener("submit",async(e)=>{

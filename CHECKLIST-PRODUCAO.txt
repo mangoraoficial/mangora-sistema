@@ -1,0 +1,22 @@
+MANGORA V18 CLOUD - ETAPA 4 / CHECKLIST DE PRODUÇÃO
+
+1. Execute SUPABASE-ETAPA4-SEGURANCA.sql e confirme Success.
+2. No Supabase, mantenha somente usuários administrativos autorizados.
+3. Em Authentication, desative cadastro público de novos usuários antes da entrega.
+4. Publique os arquivos desta Etapa 4 no mesmo GitHub Pages.
+5. Faça Ctrl+F5 no painel e no cliente.
+6. Teste login administrativo.
+7. Teste pedido pelo celular do cliente.
+8. Teste atualização de status e acompanhamento.
+9. Teste cliente, despesa e matéria-prima.
+10. Teste impressão térmica no notebook.
+11. Exporte um backup JSON e guarde uma cópia.
+12. Depois de todos os testes, esta versão pode ser congelada como Mangora 1.0 Produção.
+
+SEGURANÇA APLICADA
+- Publishable key no navegador: permitido.
+- Secret/service_role: não utilizada no front-end.
+- Pedidos públicos entram por RPC SECURITY DEFINER.
+- Acesso anônimo direto às tabelas operacionais foi revogado.
+- Usuários autenticados precisam também constar em admin_users.
+- Acompanhamento público usa tracking_token, sem liberar a tabela de pedidos.
