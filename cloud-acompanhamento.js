@@ -12,6 +12,7 @@ function statusTexto(status){
     case "Em preparo": return "🟡 Seu pedido está sendo preparado";
     case "Saiu para entrega": return "🚚 Seu pedido saiu para entrega";
     case "Pronto": return "🥭 Seu pedido está pronto";
+    case "Pronto para retirada": return "🏪 Seu pedido está pronto para retirada";
     case "Finalizado": return "✅ Pedido finalizado";
     case "Cancelado": return "🔴 Pedido cancelado";
     default: return status||"Status não informado";

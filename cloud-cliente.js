@@ -44,7 +44,7 @@ window.enviarPedido=async function(){
 
   if(!nome){alert("Informe seu nome.");return;}
   if(!telefone){alert("Informe seu WhatsApp.");return;}
-  if(!endereco){alert("Informe seu endereço.");return;}
+  if(tipoRecebimentoCliente==="Delivery" && !endereco){alert("Informe seu endereço para entrega.");return;}
   if(carrinho.length===0){alert("Seu carrinho está vazio.");return;}
   if(carrinho.some(i=>Number(i.preco||0)<=0 || Number(i.total||0)<=0)){
     alert("Há item sem preço válido no carrinho.");
@@ -55,14 +55,14 @@ window.enviarPedido=async function(){
   if(botao){botao.disabled=true;botao.textContent="Enviando pedido...";}
 
   const subtotal=carrinho.reduce((s,i)=>s+Number(i.total||0),0);
-  const taxaEntrega=TAXA_ENTREGA_MANGORA;
+  const taxaEntrega=tipoRecebimentoCliente==="Delivery" ? TAXA_ENTREGA_MANGORA : 0;
   const total=subtotal+taxaEntrega;
 
   const dadosPedido={
     cliente_nome:nome,
     telefone,
     endereco,
-    tipo_atendimento:"Delivery",
+    tipo_atendimento:tipoRecebimentoCliente,
     pagamento,
     observacao,
     origem:"Cliente",
@@ -99,10 +99,10 @@ window.enviarPedido=async function(){
     if(resumoPagamento){
       if(pagamento==="Pix"){
         resumoPagamento.style.display="grid";
-        resumoPagamento.innerHTML=`<strong>Pagamento por PIX</strong><span>Total do pedido: <b>${moeda(total)}</b></span><span>Chave PIX (celular): <b>${CHAVE_PIX_MANGORA}</b></span><button type="button" class="btn-copiar-pix" onclick="copiarChavePix()">Copiar chave PIX</button><small>O pagamento será confirmado pela loja.</small>`;
+        resumoPagamento.innerHTML=`<strong>Pagamento por PIX</strong><span>${tipoRecebimentoCliente==="Delivery"?"🛵 Delivery":"🏪 Retirada na loja"}</span><span>Total do pedido: <b>${moeda(total)}</b></span><span>Chave PIX (celular): <b>${CHAVE_PIX_MANGORA}</b></span><button type="button" class="btn-copiar-pix" onclick="copiarChavePix()">Copiar chave PIX</button><small>O pagamento será confirmado pela loja.</small>`;
       }else{
         resumoPagamento.style.display="grid";
-        resumoPagamento.innerHTML=`<strong>Forma de pagamento: ${pagamento}</strong><span>Total do pedido: <b>${moeda(total)}</b></span>`;
+        resumoPagamento.innerHTML=`<strong>Forma de pagamento: ${pagamento}</strong><span>${tipoRecebimentoCliente==="Delivery"?"🛵 Delivery":"🏪 Retirada na loja"}</span><span>Total do pedido: <b>${moeda(total)}</b></span>`;
       }
     }
 

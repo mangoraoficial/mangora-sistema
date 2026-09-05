@@ -5,6 +5,11 @@
 
 let sincronizacaoCloudEmAndamento=false;
 let intervaloCloud=null;
+let idsPedidosConhecidosCloud=new Set();
+let primeiraSincronizacaoPedidosCloud=true;
+let alertasPedidosAtivos=false;
+let contextoAudioPedidos=null;
+let timerAlertaPedido=null;
 
 function atualizarIndicadorCloud(ok,texto){
   const el=document.getElementById("statusCloud");
@@ -33,6 +38,58 @@ async function sincronizarCatalogoCloudAdmin(){
   renderizarPedidoManual();
 }
 
+async function ativarAlertasPedidos(){
+  alertasPedidosAtivos=true;
+  const btn=document.getElementById("btnAtivarAlertas");
+  if(btn){btn.classList.add("ativo");btn.textContent="🔔 Alertas ativos";}
+  try{
+    contextoAudioPedidos=contextoAudioPedidos||new (window.AudioContext||window.webkitAudioContext)();
+    if(contextoAudioPedidos.state==="suspended")await contextoAudioPedidos.resume();
+    tocarSomNovoPedido();
+  }catch(e){}
+  if("Notification" in window && Notification.permission==="default"){
+    try{await Notification.requestPermission();}catch(e){}
+  }
+}
+
+function tocarSomNovoPedido(){
+  if(!alertasPedidosAtivos||!contextoAudioPedidos)return;
+  const agora=contextoAudioPedidos.currentTime;
+  [0,.18,.36].forEach((atraso,i)=>{
+    const osc=contextoAudioPedidos.createOscillator(),ganho=contextoAudioPedidos.createGain();
+    osc.type="sine";osc.frequency.value=i===1?880:740;
+    ganho.gain.setValueAtTime(.0001,agora+atraso);
+    ganho.gain.exponentialRampToValueAtTime(.22,agora+atraso+.015);
+    ganho.gain.exponentialRampToValueAtTime(.0001,agora+atraso+.14);
+    osc.connect(ganho);ganho.connect(contextoAudioPedidos.destination);
+    osc.start(agora+atraso);osc.stop(agora+atraso+.16);
+  });
+}
+
+function fecharAlertaNovoPedido(){
+  document.getElementById("alertaNovoPedido")?.classList.remove("mostrar");
+  if(timerAlertaPedido)clearTimeout(timerAlertaPedido);
+}
+
+function dispararAlertaNovoPedido(novos){
+  if(!novos?.length)return;
+  const ultimo=novos[novos.length-1],box=document.getElementById("alertaNovoPedido"),texto=document.getElementById("alertaNovoPedidoTexto");
+  if(texto){
+    const tipo=ultimo.tipoAtendimento==="Retirada na loja"?"Retirada":ultimo.tipoAtendimento||"Delivery";
+    texto.textContent=novos.length>1?`${novos.length} novos pedidos`:`${referenciaPedido(ultimo)} • ${ultimo.cliente||"Cliente"} • ${tipo}`;
+  }
+  box?.classList.add("mostrar");
+  if(timerAlertaPedido)clearTimeout(timerAlertaPedido);
+  timerAlertaPedido=setTimeout(fecharAlertaNovoPedido,12000);
+  tocarSomNovoPedido();
+  const tituloOriginal="Mangora - Painel da Loja";
+  document.title=`🔔 NOVO PEDIDO • ${tituloOriginal}`;
+  setTimeout(()=>document.title=tituloOriginal,12000);
+  if(alertasPedidosAtivos && "Notification" in window && Notification.permission==="granted"){
+    try{new Notification("Mangora • Novo pedido",{body:`${ultimo.cliente||"Cliente"} • ${ultimo.tipoAtendimento||"Delivery"} • ${moeda(ultimo.total)}`,icon:"img/logo.png"});}catch(e){}
+  }
+}
+
 async function sincronizarPedidosCloud(){
   if(sincronizacaoCloudEmAndamento)return;
   sincronizacaoCloudEmAndamento=true;
@@ -40,6 +97,15 @@ async function sincronizarPedidosCloud(){
   try{
     const lista=await cloudLerPedidos();
     pedidos=lista.map(normalizarPedido);
+    const idsAtuais=new Set(pedidos.map(p=>String(p.id)));
+    if(primeiraSincronizacaoPedidosCloud){
+      idsPedidosConhecidosCloud=idsAtuais;
+      primeiraSincronizacaoPedidosCloud=false;
+    }else{
+      const novos=pedidos.filter(p=>!idsPedidosConhecidosCloud.has(String(p.id)) && p.origem==="Cliente");
+      idsPedidosConhecidosCloud=idsAtuais;
+      if(novos.length)dispararAlertaNovoPedido(novos);
+    }
     localStorage.setItem("mangora_pedidos",JSON.stringify(pedidos));
 
     listarPedidos();
@@ -185,10 +251,12 @@ window.alterarStatus=async function(id){
   const pedido=pedidos.find(p=>p.id==id);
   if(!pedido||pedidoCancelado(pedido))return;
 
-  const mesa=tipoPedidoPainel(pedido)==="mesa";
-  const fluxo=mesa
+  const tipo=tipoPedidoPainel(pedido);
+  const fluxo=tipo==="mesa"
     ?["Recebido","Em preparo","Pronto","Finalizado"]
-    :["Recebido","Em preparo","Saiu para entrega","Finalizado"];
+    :tipo==="retirada"
+      ?["Recebido","Em preparo","Pronto para retirada","Finalizado"]
+      :["Recebido","Em preparo","Saiu para entrega","Finalizado"];
   const indice=fluxo.indexOf(pedido.status);
   const novo=indice>=0&&indice<fluxo.length-1?fluxo[indice+1]:"Finalizado";
 

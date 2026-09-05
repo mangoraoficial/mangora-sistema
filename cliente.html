@@ -30,6 +30,16 @@
     .pix-chave-linha code{font-size:16px;font-weight:800;padding:8px 10px;background:#fff;border:1px dashed #7aad6d;border-radius:10px}
     .btn-copiar-pix{border:0;border-radius:10px;padding:9px 12px;background:#1f7a35;color:#fff;font-weight:800;cursor:pointer}
   </style>
+  <style>
+    .tipo-recebimento-cliente{margin:0 0 16px;padding:14px;border:1px solid rgba(21,91,42,.16);border-radius:14px;background:#f7fbf4}
+    .tipo-recebimento-titulo{display:block;font-weight:900;color:#155b2a;margin-bottom:9px}
+    .tipo-recebimento-botoes{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .tipo-recebimento-btn{border:1px solid #d3dfcf;background:#fff;color:#29432f;border-radius:10px;padding:11px 8px;font-weight:850;cursor:pointer}
+    .tipo-recebimento-btn.ativo{background:#155b2a;color:#fff;border-color:#155b2a}
+    #avisoTipoRecebimento{display:block;margin-top:8px;color:#687268}
+    #campoEnderecoCliente input{width:100%}
+    @media(max-width:520px){.tipo-recebimento-botoes{grid-template-columns:1fr}}
+  </style>
 </head>
 <body class="site-cliente">
 
@@ -77,9 +87,20 @@
     <section id="formPedido" class="form-box" style="display:none;">
       <h2>Dados do pedido</h2>
 
+      <div class="tipo-recebimento-cliente">
+        <span class="tipo-recebimento-titulo">Como você quer receber?</span>
+        <div class="tipo-recebimento-botoes">
+          <button type="button" id="btnTipoDelivery" class="tipo-recebimento-btn ativo" onclick="selecionarTipoRecebimento('Delivery')">🛵 Delivery</button>
+          <button type="button" id="btnTipoRetirada" class="tipo-recebimento-btn" onclick="selecionarTipoRecebimento('Retirada na loja')">🏪 Retirada na loja</button>
+        </div>
+        <small id="avisoTipoRecebimento">Delivery possui taxa fixa de R$ 5,00.</small>
+      </div>
+
       <input id="nome" placeholder="Nome">
       <input id="telefone" placeholder="WhatsApp">
-      <input id="endereco" placeholder="Endereço">
+      <div id="campoEnderecoCliente">
+        <input id="endereco" placeholder="Endereço para entrega">
+      </div>
 
       <label for="pagamento"><strong>Forma de pagamento</strong></label>
       <select id="pagamento" onchange="atualizarPagamentoCliente()">

@@ -57,6 +57,7 @@ let produtos = lerProdutos();
 let carrinho = [];
 let ultimoPedido = null;
 const TAXA_ENTREGA_MANGORA = 5;
+let tipoRecebimentoCliente = "Delivery";
 const CHAVE_PIX_MANGORA = "43999649635";
 const opcoesMonte={frutas:["Manga","Abacaxi","Morango","Kiwi"],temperos:["Chamoy","Tajín","Limão","Pimenta em pó","Sal rosa","Lemon Pepper","Páprica doce","Páprica picante"],coberturas:["Leite condensado","Mel","Creme Ninho","Iogurte natural","Creme de chocolate","Creme de maracujá"]};
 function lerConfigMonte(){try{return JSON.parse(localStorage.getItem("mangora_config_monte"))||{preco400:0,preco500:0,adicionalFruta:0,adicionalTempero:0,adicionalCobertura:0};}catch(e){return {preco400:0,preco500:0,adicionalFruta:0,adicionalTempero:0,adicionalCobertura:0};}}
@@ -239,7 +240,7 @@ function atualizarCarrinho(){
     `;
   });
 
-  const taxaEntrega = carrinho.length ? TAXA_ENTREGA_MANGORA : 0;
+  const taxaEntrega = carrinho.length && tipoRecebimentoCliente==="Delivery" ? TAXA_ENTREGA_MANGORA : 0;
   const total = subtotal + taxaEntrega;
   if(campoSubtotal) campoSubtotal.textContent = `Subtotal: ${moeda(subtotal)}`;
   if(campoEntrega) campoEntrega.textContent = `Taxa de entrega: ${moeda(taxaEntrega)}`;
@@ -317,6 +318,20 @@ function calcularMonte(){const tamanho=document.querySelector('input[name="taman
 function atualizarResumoMonte(){const r=calcularMonte(),a=document.getElementById("resumoMonte"),p=document.getElementById("precoMonte");if(!a||!p)return;a.innerHTML=`<p><strong>${r.tamanho} ml</strong></p><p>Frutas: ${r.frutas.join(", ")||"Nenhuma"} ${r.extrasFrutas?`(+${r.extrasFrutas} extra)`:""}</p><p>Temperos: ${r.temperos.join(", ")||"Nenhum"} ${r.extrasTemperos?`(+${r.extrasTemperos} extra)`:""}</p><p>Coberturas: ${r.coberturas.join(", ")||"Nenhuma"} ${r.extrasCoberturas?`(+${r.extrasCoberturas} extra)`:""}</p>`;p.textContent=r.total>0?`Total: ${moeda(r.total)}`:"Preço a definir";}
 function adicionarMonteCarrinho(){const r=calcularMonte();if(!r.frutas.length){alert("Escolha pelo menos uma fruta.");return;}if(Number(r.total||0)<=0){alert("Este tamanho está temporariamente indisponível porque o preço ainda não foi configurado.");return;}const detalhes=`Frutas: ${r.frutas.join(", ")} | Temperos: ${r.temperos.join(", ")||"sem tempero"} | Coberturas: ${r.coberturas.join(", ")||"sem cobertura"}`;carrinho.push({id:Date.now(),produtoId:null,nome:`Monte do Seu Jeito - ${r.tamanho} ml`,detalhes,preco:r.total,quantidade:1,total:r.total,personalizado:true,montagem:r});atualizarCarrinho();mostrarToastCliente("Adicionado ao carrinho ✓");}
 
+function selecionarTipoRecebimento(tipo){
+  tipoRecebimentoCliente = tipo==="Retirada na loja" ? "Retirada na loja" : "Delivery";
+  const delivery=tipoRecebimentoCliente==="Delivery";
+  document.getElementById("btnTipoDelivery")?.classList.toggle("ativo",delivery);
+  document.getElementById("btnTipoRetirada")?.classList.toggle("ativo",!delivery);
+  const campo=document.getElementById("campoEnderecoCliente");
+  if(campo)campo.style.display=delivery?"block":"none";
+  const endereco=document.getElementById("endereco");
+  if(endereco&&!delivery)endereco.value="";
+  const aviso=document.getElementById("avisoTipoRecebimento");
+  if(aviso)aviso.textContent=delivery?"Delivery possui taxa fixa de R$ 5,00.":"Retire seu pedido na loja. Sem taxa de entrega.";
+  atualizarCarrinho();
+}
+
 function abrirFormulario(){
   if(carrinho.length === 0){
     alert("Adicione produtos ao carrinho.");
@@ -364,8 +379,8 @@ function enviarPedido(){
     return;
   }
 
-  if(!endereco){
-    alert("Informe seu endereço.");
+  if(tipoRecebimentoCliente==="Delivery" && !endereco){
+    alert("Informe seu endereço para entrega.");
     return;
   }
 

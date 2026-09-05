@@ -578,7 +578,9 @@ function adicionarMonteManual(){
 let filtroPedidosAtual = "todos";
 
 function tipoPedidoPainel(pedido){
-  return pedido && pedido.tipoAtendimento === "Mesa/Comanda" ? "mesa" : "delivery";
+  if(pedido?.tipoAtendimento==="Mesa/Comanda") return "mesa";
+  if(pedido?.tipoAtendimento==="Retirada na loja") return "retirada";
+  return "delivery";
 }
 
 function filtrarPedidos(filtro){
@@ -587,7 +589,8 @@ function filtrarPedidos(filtro){
   const ids = {
     todos:"filtroTodos",
     delivery:"filtroDelivery",
-    mesa:"filtroMesa"
+    mesa:"filtroMesa",
+    retirada:"filtroRetirada"
   };
 
   Object.entries(ids).forEach(([chave,id])=>{
@@ -600,6 +603,7 @@ function filtrarPedidos(filtro){
     titulo.textContent =
       filtroPedidosAtual==="delivery" ? "Pedidos Delivery" :
       filtroPedidosAtual==="mesa" ? "Pedidos de Mesas / Comandas" :
+      filtroPedidosAtual==="retirada" ? "Pedidos para Retirada" :
       "Todos os pedidos";
   }
 
@@ -610,11 +614,13 @@ function atualizarContadoresPedidos(){
   const total=pedidos.length;
   const delivery=pedidos.filter(p=>tipoPedidoPainel(p)==="delivery").length;
   const mesa=pedidos.filter(p=>tipoPedidoPainel(p)==="mesa").length;
+  const retirada=pedidos.filter(p=>tipoPedidoPainel(p)==="retirada").length;
 
   const mapa={
     qtdTodosPedidos:total,
     qtdDeliveryPedidos:delivery,
-    qtdMesaPedidos:mesa
+    qtdMesaPedidos:mesa,
+    qtdRetiradaPedidos:retirada
   };
 
   Object.entries(mapa).forEach(([id,valor])=>{
@@ -703,8 +709,10 @@ function listarPedidos(){
       `)
       .join("");
 
-    const mesa = tipoPedidoPainel(p)==="mesa";
-    const atendimento = mesa ? "🍽️ Mesa / Comanda" : "🛵 Delivery";
+    const tipoPainel = tipoPedidoPainel(p);
+    const mesa = tipoPainel==="mesa";
+    const retirada = tipoPainel==="retirada";
+    const atendimento = mesa ? "🍽️ Mesa / Comanda" : retirada ? "🏪 Retirada na loja" : "🛵 Delivery";
     const identificacao = mesa && p.comanda
       ? `<div class="pedido-comanda">${p.comanda}</div>`
       : "";
@@ -1035,9 +1043,13 @@ function whatsappPedido(id){
 
 function imprimirPedido(id){
  const p=pedidos.find(x=>x.id==id);if(!p)return;
- const mesa=p.tipoAtendimento==="Mesa/Comanda", atendimento=mesa?"MESA / COMANDA":"DELIVERY";
+ const mesa=p.tipoAtendimento==="Mesa/Comanda", retirada=p.tipoAtendimento==="Retirada na loja", atendimento=mesa?"MESA / COMANDA":retirada?"RETIRADA NA LOJA":"DELIVERY";
  const itens=(p.itens||[]).map(i=>{const d=detalhesItemPedido(i),v=Number(i.total||0)>0?moeda(i.total):"A DEFINIR";return `<div class="item"><div class="top"><b>${Number(i.quantidade||1)}x ${i.nome}</b><b>${v}</b></div>${d?`<div class="det">${d}</div>`:""}</div>`}).join("");
- const dados=mesa?`<div class="mesa">${p.comanda||"MESA / COMANDA"}</div><div><b>Cliente:</b> ${p.cliente||"Cliente"}</div>`:`<div><b>Cliente:</b> ${p.cliente||"-"}</div><div><b>Telefone:</b> ${p.telefone||"-"}</div><div><b>Endereco:</b> ${p.endereco||"-"}</div>`;
+ const dados=mesa
+   ?`<div class="mesa">${p.comanda||"MESA / COMANDA"}</div><div><b>Cliente:</b> ${p.cliente||"Cliente"}</div>`
+   :retirada
+     ?`<div><b>Cliente:</b> ${p.cliente||"-"}</div><div><b>Telefone:</b> ${p.telefone||"-"}</div><div><b>Retirada:</b> NA LOJA</div>`
+     :`<div><b>Cliente:</b> ${p.cliente||"-"}</div><div><b>Telefone:</b> ${p.telefone||"-"}</div><div><b>Endereco:</b> ${p.endereco||"-"}</div>`;
  const w=window.open("","_blank","width=420,height=700");if(!w){alert("Permita pop-ups para imprimir.");return;}
  w.document.write(`<!doctype html><html><head><meta charset="UTF-8"><title>Pedido ${referenciaPedido(p)}</title><style>
  @page{size:58mm auto;margin:2mm}*{box-sizing:border-box}html,body{margin:0;padding:0;width:54mm;color:#000;background:#fff}
