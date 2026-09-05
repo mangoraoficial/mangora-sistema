@@ -115,6 +115,7 @@ function pedidoCloudParaLocal(p){
     comanda:p.comanda||"",
     tipoAtendimento:p.tipo_atendimento||"Delivery",
     pagamento:p.pagamento||"Não informado",
+    statusPagamento:p.status_pagamento||"Não informado",
     observacao:p.observacao||"",
     status:p.status||"Recebido",
     origem:p.origem||"Cliente",

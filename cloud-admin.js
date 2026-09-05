@@ -161,6 +161,26 @@ window.finalizarPedido=async function(){
   }
 };
 
+
+window.confirmarPagamentoPix=async function(id){
+  const pedido=pedidos.find(p=>p.id==id);
+  if(!pedido || pedidoCancelado(pedido)) return;
+  if(String(pedido.pagamento||"").trim().toLowerCase()!=="pix") return;
+  if(!confirm(`Confirmar recebimento do PIX do pedido ${referenciaPedido(pedido)}?`)) return;
+
+  try{
+    await mangoraRequest(`/rest/v1/pedidos?id=eq.${encodeURIComponent(id)}`,{
+      method:"PATCH",
+      auth:true,
+      body:{status_pagamento:"Pago"},
+      prefer:"return=minimal"
+    });
+    await sincronizarPedidosCloud();
+  }catch(erro){
+    alert(`Não foi possível confirmar o PIX.\n\n${erro.message}`);
+  }
+};
+
 window.alterarStatus=async function(id){
   const pedido=pedidos.find(p=>p.id==id);
   if(!pedido||pedidoCancelado(pedido))return;

@@ -152,6 +152,11 @@ function normalizarPedido(p){
   pedido.telefone = pedido.telefone || "";
   pedido.endereco = pedido.endereco || "";
   pedido.pagamento = pedido.pagamento || "Não informado";
+  pedido.statusPagamento = pedido.statusPagamento || (
+    String(pedido.pagamento).toLowerCase()==="pix"
+      ? "Aguardando pagamento"
+      : "Pagamento na entrega/loja"
+  );
   pedido.taxaEntrega = Number(pedido.taxaEntrega || pedido.taxa_entrega || 0);
   pedido.data = pedido.data || new Date().toLocaleString("pt-BR");
 
@@ -653,6 +658,26 @@ function excluirPedido(id){
   atualizarSistema();
 }
 
+
+function pagamentoEhPix(p){
+  return String(p?.pagamento||"").trim().toLowerCase()==="pix";
+}
+
+function statusPagamentoPedido(p){
+  const atual=String(p?.statusPagamento||"").trim();
+  if(atual && atual!=="Não informado") return atual;
+  return pagamentoEhPix(p) ? "Aguardando pagamento" : "Pagamento na entrega/loja";
+}
+
+function confirmarPagamentoPix(id){
+  const pedido=pedidos.find(p=>p.id==id);
+  if(!pedido || pedidoCancelado(pedido) || !pagamentoEhPix(pedido)) return;
+  if(!confirm(`Confirmar recebimento do PIX do pedido ${referenciaPedido(pedido)}?`)) return;
+  pedido.statusPagamento="Pago";
+  salvarDados();
+  atualizarSistema();
+}
+
 function listarPedidos(){
   const tabela = document.getElementById("tabelaPedidos");
   if(!tabela) return;
@@ -694,6 +719,13 @@ function listarPedidos(){
         </td>
         <td>${itens || "-"}</td>
         <td>${moeda(p.total)}</td>
+        <td>
+          <div><strong>${p.pagamento||"-"}</strong></div>
+          <div style="margin:5px 0;font-size:12px;font-weight:800;${statusPagamentoPedido(p)==="Pago"?"color:#157a2d":"color:#9a6200"}">${statusPagamentoPedido(p)}</div>
+          ${pagamentoEhPix(p) && statusPagamentoPedido(p)!=="Pago" && !pedidoCancelado(p)
+            ? `<button class="btn-status" onclick="confirmarPagamentoPix(${p.id})">Confirmar PIX</button>`
+            : ""}
+        </td>
         <td>
           ${pedidoCancelado(p)
             ? `<span class="status-cancelado">Cancelado</span>${p.motivoCancelamento?`<div class="motivo-cancelamento">${p.motivoCancelamento}</div>`:""}`
@@ -996,7 +1028,7 @@ function whatsappPedido(id){
     if(detalhes) texto += `   ${detalhes}\n`;
   });
 
-  texto += `\nTotal: ${moeda(p.total)}\nPagamento: ${p.pagamento}\nStatus: ${p.status}`;
+  texto += `\nTotal: ${moeda(p.total)}\nPagamento: ${p.pagamento}\nStatus do pagamento: ${statusPagamentoPedido(p)}\nStatus do pedido: ${p.status}`;
 
   window.open(`https://wa.me/${telefone}?text=${encodeURIComponent(texto)}`,"_blank");
 }
@@ -1017,7 +1049,7 @@ function imprimirPedido(id){
  <div class="c"><div class="marca">MANGORA</div><div class="sub">FRUTAS TEMPERADAS</div></div><div class="linha"></div>
  <div class="c pedido">PEDIDO ${referenciaPedido(p)}</div><div class="c">${p.data||""}</div><div class="tipo">${atendimento}</div>${dados}<div class="linha"></div>${itens}<div class="linha"></div>
  ${(()=>{const subtotal=(p.itens||[]).reduce((s,i)=>s+Number(i.total||0),0),taxa=Number(p.taxaEntrega||0);return `<div><b>Subtotal:</b> ${moeda(subtotal)}</div>${taxa>0?`<div><b>Taxa de entrega:</b> ${moeda(taxa)}</div>`:""}`})()}
- <div class="total"><span>TOTAL</span><span>${moeda(p.total)}</span></div><div><b>Pagamento:</b> ${p.pagamento||"-"}</div><div><b>Status:</b> ${p.status||"-"}</div>
+ <div class="total"><span>TOTAL</span><span>${moeda(p.total)}</span></div><div><b>Pagamento:</b> ${p.pagamento||"-"}</div><div><b>Status do pagamento:</b> ${statusPagamentoPedido(p)}</div><div><b>Status do pedido:</b> ${p.status||"-"}</div>
  ${p.observacao?`<div class="obs"><b>OBS:</b><br>${p.observacao}</div>`:""}<div class="linha"></div><div class="rod">MANGORA - FRUTAS TEMPERADAS</div><div style="height:8mm"></div>
  <script>window.onload=function(){setTimeout(function(){window.print()},300)};<\/script></body></html>`);w.document.close();
 }
