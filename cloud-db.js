@@ -80,26 +80,34 @@ async function cloudLerConfigMonte(auth=false){
   const r=rows?.[0];
   if(!r) return null;
   return {
-    preco400:Number(r.preco_400||0),
-    preco500:Number(r.preco_500||0),
-    adicionalFruta:Number(r.adicional_fruta||0),
-    adicionalTempero:Number(r.adicional_tempero||0),
-    adicionalCobertura:Number(r.adicional_cobertura||0)
+    base500:Number(r.base_500 ?? r.preco_500 ?? 5),
+    manga:Number(r.fruta_manga ?? 7),
+    abacaxi:Number(r.fruta_abacaxi ?? 7),
+    kiwi:Number(r.fruta_kiwi ?? 8),
+    morango:Number(r.fruta_morango ?? 8),
+    tempero:Number(r.tempero_unitario ?? r.adicional_tempero ?? 2),
+    leiteCondensado:Number(r.cob_leite_condensado ?? 3),
+    cremeNinho:Number(r.cob_creme_ninho ?? 5),
+    cremeChocolate:Number(r.cob_creme_chocolate ?? 5),
+    cremeMaracuja:Number(r.cob_creme_maracuja ?? 5),
+    mel:Number(r.cob_mel ?? 5),
+    iogurte:Number(r.cob_iogurte ?? 5)
   };
 }
 
 async function cloudSalvarConfigMonte(c){
   return mangoraRequest("/rest/v1/config_monte?on_conflict=id",{
-    method:"POST",
-    auth:true,
-    prefer:"resolution=merge-duplicates,return=minimal",
+    method:"POST",auth:true,prefer:"resolution=merge-duplicates,return=minimal",
     body:[{
-      id:1,
-      preco_400:Number(c.preco400||0),
-      preco_500:Number(c.preco500||0),
-      adicional_fruta:Number(c.adicionalFruta||0),
-      adicional_tempero:Number(c.adicionalTempero||0),
-      adicional_cobertura:Number(c.adicionalCobertura||0),
+      id:1,base_500:Number(c.base500||0),
+      fruta_manga:Number(c.manga||0),fruta_abacaxi:Number(c.abacaxi||0),
+      fruta_kiwi:Number(c.kiwi||0),fruta_morango:Number(c.morango||0),
+      tempero_unitario:Number(c.tempero||0),
+      cob_leite_condensado:Number(c.leiteCondensado||0),
+      cob_creme_ninho:Number(c.cremeNinho||0),
+      cob_creme_chocolate:Number(c.cremeChocolate||0),
+      cob_creme_maracuja:Number(c.cremeMaracuja||0),
+      cob_mel:Number(c.mel||0),cob_iogurte:Number(c.iogurte||0),
       atualizado_em:new Date().toISOString()
     }]
   });

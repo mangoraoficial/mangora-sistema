@@ -143,23 +143,29 @@ window.salvarPrecosCarte=async function(){
 };
 
 window.salvarConfiguracaoMonte=async function(){
-  const cfg={
-    preco400:Number(document.getElementById("preco400").value||0),
-    preco500:Number(document.getElementById("preco500").value||0),
-    adicionalFruta:Number(document.getElementById("adicionalFruta").value||0),
-    adicionalTempero:Number(document.getElementById("adicionalTempero").value||0),
-    adicionalCobertura:Number(document.getElementById("adicionalCobertura").value||0)
-  };
+ const cfg={
+  base500:Number(document.getElementById("monteBase500").value||0),
+  manga:Number(document.getElementById("monteManga").value||0),
+  abacaxi:Number(document.getElementById("monteAbacaxi").value||0),
+  kiwi:Number(document.getElementById("monteKiwi").value||0),
+  morango:Number(document.getElementById("monteMorango").value||0),
+  tempero:Number(document.getElementById("monteTempero").value||0),
+  leiteCondensado:Number(document.getElementById("monteLeiteCondensado").value||0),
+  cremeNinho:Number(document.getElementById("monteCremeNinho").value||0),
+  cremeChocolate:Number(document.getElementById("monteCremeChocolate").value||0),
+  cremeMaracuja:Number(document.getElementById("monteCremeMaracuja").value||0),
+  mel:Number(document.getElementById("monteMel").value||0),
+  iogurte:Number(document.getElementById("monteIogurte").value||0)
+ };
+ try{
+  await cloudSalvarConfigMonte(cfg);
+  configuracaoMonte=cfg;
+  localStorage.setItem("mangora_config_monte",JSON.stringify(cfg));
+  carregarConfiguracaoMonte();renderizarPedidoManual();
+  alert("Preços do Monte do Seu Jeito salvos na nuvem.");
+ }catch(erro){alert(`Não foi possível salvar a configuração.
 
-  try{
-    await cloudSalvarConfigMonte(cfg);
-    configuracaoMonte=cfg;
-    localStorage.setItem("mangora_config_monte",JSON.stringify(cfg));
-    renderizarPedidoManual();
-    alert("Configuração salva na nuvem.");
-  }catch(erro){
-    alert(`Não foi possível salvar a configuração.\n\n${erro.message}`);
-  }
+${erro.message}`);}
 };
 
 window.finalizarPedido=async function(){

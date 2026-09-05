@@ -162,38 +162,28 @@
 
         <div id="produtosMonteAdmin" style="display:none;">
           <div class="bloco">
-            <h3>Preços e adicionais</h3>
-            <p class="texto-suave">Configure os dois tamanhos e os valores cobrados quando o cliente ultrapassar os itens inclusos.</p>
-
+            <h3>Monte do Seu Jeito — 500 ml</h3>
+            <p class="texto-suave">Configure a base e o valor de cada ingrediente. O cliente precisa escolher pelo menos 1 fruta.</p>
             <div class="formulario">
-              <input id="preco400" type="number" step="0.01" placeholder="Preço 400 ml">
-              <input id="preco500" type="number" step="0.01" placeholder="Preço 500 ml">
-              <input id="adicionalFruta" type="number" step="0.01" placeholder="Fruta adicional">
-              <input id="adicionalTempero" type="number" step="0.01" placeholder="Tempero adicional">
-              <input id="adicionalCobertura" type="number" step="0.01" placeholder="Cobertura adicional">
-              <button onclick="salvarConfiguracaoMonte()">Salvar configuração</button>
+              <input id="monteBase500" type="number" step="0.01" placeholder="Base 500 ml">
+              <input id="monteManga" type="number" step="0.01" placeholder="Manga">
+              <input id="monteAbacaxi" type="number" step="0.01" placeholder="Abacaxi">
+              <input id="monteKiwi" type="number" step="0.01" placeholder="Kiwi">
+              <input id="monteMorango" type="number" step="0.01" placeholder="Morango">
+              <input id="monteTempero" type="number" step="0.01" placeholder="Qualquer tempero">
+              <input id="monteLeiteCondensado" type="number" step="0.01" placeholder="Leite condensado">
+              <input id="monteCremeNinho" type="number" step="0.01" placeholder="Creme Ninho">
+              <input id="monteCremeChocolate" type="number" step="0.01" placeholder="Creme de chocolate">
+              <input id="monteCremeMaracuja" type="number" step="0.01" placeholder="Creme de maracujá">
+              <input id="monteMel" type="number" step="0.01" placeholder="Mel">
+              <input id="monteIogurte" type="number" step="0.01" placeholder="Iogurte natural">
+              <button onclick="salvarConfiguracaoMonte()">Salvar preços do Monte</button>
             </div>
           </div>
-
           <div class="cards">
-            <div class="card"><span>Frutas inclusas</span><strong>Até 2</strong></div>
-            <div class="card laranja"><span>Temperos inclusos</span><strong>Até 3</strong></div>
-            <div class="card amarelo"><span>Coberturas inclusas</span><strong>Até 2</strong></div>
-          </div>
-
-          <div class="bloco opcoes-resumo">
-            <div>
-              <strong>Frutas</strong>
-              <p>Manga • Abacaxi • Morango • Kiwi</p>
-            </div>
-            <div>
-              <strong>Temperos</strong>
-              <p>Chamoy • Tajín • Limão • Pimenta em pó • Sal rosa • Lemon Pepper • Páprica doce • Páprica picante</p>
-            </div>
-            <div>
-              <strong>Coberturas</strong>
-              <p>Leite condensado • Mel • Creme Ninho • Iogurte natural • Creme de chocolate • Creme de maracujá</p>
-            </div>
+            <div class="card"><span>Tamanho</span><strong>500 ml</strong></div>
+            <div class="card laranja"><span>Fruta obrigatória</span><strong>Mínimo 1</strong></div>
+            <div class="card amarelo"><span>Ingredientes</span><strong>Livres</strong></div>
           </div>
         </div>
       </section>
@@ -265,11 +255,11 @@
 
           <div id="manualMonte" style="display:none;">
             <div class="formulario">
-              <select id="manualMonteTamanho"><option value="400">400 ml</option><option value="500">500 ml</option></select>
+              <select id="manualMonteTamanho"><option value="500">500 ml</option></select>
             </div>
-            <div class="manual-grupo"><strong>Frutas — escolha até 2 inclusas</strong><div id="manualFrutas" class="chips-manual"></div></div>
-            <div class="manual-grupo"><strong>Temperos — escolha até 3 inclusos</strong><div id="manualTemperos" class="chips-manual"></div></div>
-            <div class="manual-grupo"><strong>Coberturas — escolha até 2 inclusas</strong><div id="manualCoberturas" class="chips-manual"></div></div>
+            <div class="manual-grupo"><strong>Frutas — escolha pelo menos 1</strong><div id="manualFrutas" class="chips-manual"></div></div>
+            <div class="manual-grupo"><strong>Temperos — escolha quantos quiser</strong><div id="manualTemperos" class="chips-manual"></div></div>
+            <div class="manual-grupo"><strong>Caldas e cremes — escolha quantos quiser</strong><div id="manualCoberturas" class="chips-manual"></div></div>
             <div id="manualMontePreco" class="preco-manual">Preço a definir</div>
             <button onclick="adicionarMonteManual()">Adicionar Monte do Seu Jeito</button>
           </div>

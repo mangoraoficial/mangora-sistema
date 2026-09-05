@@ -59,13 +59,11 @@ let ultimoPedido = null;
 const TAXA_ENTREGA_MANGORA = 5;
 let tipoRecebimentoCliente = "Delivery";
 const CHAVE_PIX_MANGORA = "43999649635";
-const MONTE_V24={
-  tamanho:"500",
-  base:5,
-  frutas:{"Manga":7,"Abacaxi":7,"Kiwi":8,"Morango":8},
-  temperos:{"Chamoy":2,"Tajín":2,"Limão":2,"Pimenta em pó":2,"Sal rosa":2,"Lemon Pepper":2,"Páprica doce":2,"Páprica picante":2},
-  coberturas:{"Leite condensado":3,"Creme Ninho":5,"Creme de chocolate":5,"Creme de maracujá":5,"Mel":5,"Iogurte natural":5}
-};
+const MONTE_PADRAO={base500:5,manga:7,abacaxi:7,kiwi:8,morango:8,tempero:2,leiteCondensado:3,cremeNinho:5,cremeChocolate:5,cremeMaracuja:5,mel:5,iogurte:5};
+function configMonteAtual(){
+ try{return {...MONTE_PADRAO,...(JSON.parse(localStorage.getItem("mangora_config_monte"))||{})};}
+ catch(e){return {...MONTE_PADRAO};}
+}
 const opcoesMonte={frutas:["Manga","Abacaxi","Morango","Kiwi"],temperos:["Chamoy","Tajín","Limão","Pimenta em pó","Sal rosa","Lemon Pepper","Páprica doce","Páprica picante"],coberturas:["Leite condensado","Mel","Creme Ninho","Iogurte natural","Creme de chocolate","Creme de maracujá"]};
 function lerConfigMonte(){try{return JSON.parse(localStorage.getItem("mangora_config_monte"))||{preco400:0,preco500:0,adicionalFruta:0,adicionalTempero:0,adicionalCobertura:0};}catch(e){return {preco400:0,preco500:0,adicionalFruta:0,adicionalTempero:0,adicionalCobertura:0};}}
 const receitasCarte=[
@@ -319,7 +317,10 @@ function abrirModo(modo){
   if(btnCarte) btnCarte.classList.toggle("ativo", !mostrarMonte);
 }
 function precoItemMonteV24(grupo,nome){
-  return Number(MONTE_V24[grupo]?.[nome]||0);
+ const c=configMonteAtual();
+ if(grupo==="frutas")return Number({"Manga":c.manga,"Abacaxi":c.abacaxi,"Kiwi":c.kiwi,"Morango":c.morango}[nome]||0);
+ if(grupo==="temperos")return Number(c.tempero||0);
+ return Number({"Leite condensado":c.leiteCondensado,"Creme Ninho":c.cremeNinho,"Creme de chocolate":c.cremeChocolate,"Creme de maracujá":c.cremeMaracuja,"Mel":c.mel,"Iogurte natural":c.iogurte}[nome]||0);
 }
 function renderizarGrupo(id,g,itens){
   const area=document.getElementById(id); if(!area)return;
@@ -337,8 +338,9 @@ function selecionados(g){return [...document.querySelectorAll(`input[data-grupo=
 function calcularMonte(){
   const frutas=selecionados("frutas"),temperos=selecionados("temperos"),coberturas=selecionados("coberturas");
   const soma=(grupo,lista)=>lista.reduce((t,n)=>t+precoItemMonteV24(grupo,n),0);
-  const total=MONTE_V24.base+soma("frutas",frutas)+soma("temperos",temperos)+soma("coberturas",coberturas);
-  return {tamanho:"500",frutas,temperos,coberturas,base:MONTE_V24.base,total};
+  const c=configMonteAtual();
+  const total=Number(c.base500||0)+soma("frutas",frutas)+soma("temperos",temperos)+soma("coberturas",coberturas);
+  return {tamanho:"500",frutas,temperos,coberturas,base:Number(c.base500||0),total};
 }
 function atualizarResumoMonte(){
   const r=calcularMonte(),a=document.getElementById("resumoMonte"),p=document.getElementById("precoMonte");if(!a||!p)return;

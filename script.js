@@ -43,7 +43,7 @@ let clientes = lerJSON("mangora_clientes", []);
 let pedidos = lerJSON("mangora_pedidos", []);
 let despesas = lerJSON("mangora_despesas", []);
 let materiasPrimas = lerJSON("mangora_materias_primas", []);
-let configuracaoMonte = lerJSON("mangora_config_monte", {preco400:0,preco500:0,adicionalFruta:0,adicionalTempero:0,adicionalCobertura:0});
+let configuracaoMonte = lerJSON("mangora_config_monte",{base500:5,manga:7,abacaxi:7,kiwi:8,morango:8,tempero:2,leiteCondensado:3,cremeNinho:5,cremeChocolate:5,cremeMaracuja:5,mel:5,iogurte:5});
 let carrinho = [];
 
 // Migração leve para pedidos antigos.
@@ -552,26 +552,25 @@ function adicionarCarteManual(id,tamanho){
  mostrarCarrinho();
 }
 function valoresMonteManual(){
- const cfg=lerJSON("mangora_config_monte",{preco400:0,preco500:0,adicionalFruta:0,adicionalTempero:0,adicionalCobertura:0});
- const tamanho=document.getElementById("manualMonteTamanho")?.value||"400";
+ const cfg=lerJSON("mangora_config_monte",{base500:5,manga:7,abacaxi:7,kiwi:8,morango:8,tempero:2,leiteCondensado:3,cremeNinho:5,cremeChocolate:5,cremeMaracuja:5,mel:5,iogurte:5});
  const vals=id=>[...document.querySelectorAll(`#${id} input:checked`)].map(x=>x.value);
  const frutas=vals("manualFrutas"),temperos=vals("manualTemperos"),coberturas=vals("manualCoberturas");
- const base=Number(tamanho==="500"?cfg.preco500:cfg.preco400)||0;
- const total=base+Math.max(0,frutas.length-2)*Number(cfg.adicionalFruta||0)+Math.max(0,temperos.length-3)*Number(cfg.adicionalTempero||0)+Math.max(0,coberturas.length-2)*Number(cfg.adicionalCobertura||0);
- return {tamanho,frutas,temperos,coberturas,total};
+ const pf={"Manga":cfg.manga,"Abacaxi":cfg.abacaxi,"Kiwi":cfg.kiwi,"Morango":cfg.morango};
+ const pc={"Leite condensado":cfg.leiteCondensado,"Creme Ninho":cfg.cremeNinho,"Creme de chocolate":cfg.cremeChocolate,"Creme de maracujá":cfg.cremeMaracuja,"Mel":cfg.mel,"Iogurte natural":cfg.iogurte};
+ const total=Number(cfg.base500||0)+frutas.reduce((t,n)=>t+Number(pf[n]||0),0)+temperos.length*Number(cfg.tempero||0)+coberturas.reduce((t,n)=>t+Number(pc[n]||0),0);
+ return {tamanho:"500",frutas,temperos,coberturas,base:Number(cfg.base500||0),total};
 }
 function calcularMonteManual(){
- const r=valoresMonteManual(), el=document.getElementById("manualMontePreco");
- if(el) el.textContent=r.total>0?`Total: ${moeda(r.total)}`:"Preço a definir";
+ const r=valoresMonteManual(),el=document.getElementById("manualMontePreco");
+ if(el)el.textContent=`Total: ${moeda(r.total)}`;
 }
 function adicionarMonteManual(){
  const r=valoresMonteManual();
  if(!r.frutas.length){alert("Escolha pelo menos uma fruta.");return;}
- if(Number(r.total||0)<=0){alert("O preço deste tamanho ainda não foi configurado. Cadastre o valor em Produtos antes de vender.");return;}
- const detalhes=`Frutas: ${r.frutas.join(", ")} | Temperos: ${r.temperos.join(", ")||"sem tempero"} | Coberturas: ${r.coberturas.join(", ")||"sem cobertura"}`;
- carrinho.push({chave:`monte-${Date.now()}`,produtoId:null,nome:`Monte do Seu Jeito - ${r.tamanho} ml`,detalhes,quantidade:1,preco:r.total,total:r.total,personalizado:true,montagem:r});
+ const detalhes=`Base 500 ml: ${moeda(r.base)} | Frutas: ${r.frutas.join(", ")} | Temperos: ${r.temperos.join(", ")||"sem tempero"} | Caldas e cremes: ${r.coberturas.join(", ")||"sem cobertura"}`;
+ carrinho.push({chave:`monte-${Date.now()}`,produtoId:null,nome:"Monte do Seu Jeito - 500 ml",detalhes,quantidade:1,preco:r.total,total:r.total,personalizado:true,montagem:r});
  document.querySelectorAll("#manualMonte input:checked").forEach(x=>x.checked=false);
- calcularMonteManual(); mostrarCarrinho();
+ calcularMonteManual();mostrarCarrinho();
 }
 
 
@@ -841,11 +840,25 @@ function listarMateriaPrima(){
 }
 function excluirMateriaPrima(id){if(!confirm("Excluir esta matéria-prima?"))return;materiasPrimas=materiasPrimas.filter(m=>m.id!==id);salvarDados();atualizarSistema();}
 function salvarConfiguracaoMonte(){
-  configuracaoMonte={preco400:Number(document.getElementById("preco400").value||0),preco500:Number(document.getElementById("preco500").value||0),adicionalFruta:Number(document.getElementById("adicionalFruta").value||0),adicionalTempero:Number(document.getElementById("adicionalTempero").value||0),adicionalCobertura:Number(document.getElementById("adicionalCobertura").value||0)};
-  localStorage.setItem("mangora_config_monte",JSON.stringify(configuracaoMonte));alert("Configuração salva.");
+ configuracaoMonte={
+  base500:Number(document.getElementById("monteBase500").value||0),
+  manga:Number(document.getElementById("monteManga").value||0),
+  abacaxi:Number(document.getElementById("monteAbacaxi").value||0),
+  kiwi:Number(document.getElementById("monteKiwi").value||0),
+  morango:Number(document.getElementById("monteMorango").value||0),
+  tempero:Number(document.getElementById("monteTempero").value||0),
+  leiteCondensado:Number(document.getElementById("monteLeiteCondensado").value||0),
+  cremeNinho:Number(document.getElementById("monteCremeNinho").value||0),
+  cremeChocolate:Number(document.getElementById("monteCremeChocolate").value||0),
+  cremeMaracuja:Number(document.getElementById("monteCremeMaracuja").value||0),
+  mel:Number(document.getElementById("monteMel").value||0),
+  iogurte:Number(document.getElementById("monteIogurte").value||0)
+ };
+ localStorage.setItem("mangora_config_monte",JSON.stringify(configuracaoMonte));alert("Configuração salva.");
 }
 function carregarConfiguracaoMonte(){
-  ["preco400","preco500","adicionalFruta","adicionalTempero","adicionalCobertura"].forEach(id=>{const e=document.getElementById(id);if(e)e.value=Number(configuracaoMonte[id]||0)||"";});
+ const mapa={monteBase500:"base500",monteManga:"manga",monteAbacaxi:"abacaxi",monteKiwi:"kiwi",monteMorango:"morango",monteTempero:"tempero",monteLeiteCondensado:"leiteCondensado",monteCremeNinho:"cremeNinho",monteCremeChocolate:"cremeChocolate",monteCremeMaracuja:"cremeMaracuja",monteMel:"mel",monteIogurte:"iogurte"};
+ Object.entries(mapa).forEach(([id,chave])=>{const e=document.getElementById(id);if(e)e.value=Number(configuracaoMonte[chave]||0)||"";});
 }
 
 
