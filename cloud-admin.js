@@ -118,7 +118,9 @@ window.finalizarPedido=async function(){
     if(!comanda){alert("Informe a mesa ou comanda.");return;}
   }
 
-  const total=carrinho.reduce((s,i)=>s+Number(i.total||0),0);
+  const subtotal=carrinho.reduce((s,i)=>s+Number(i.total||0),0);
+  const taxaEntrega=atendimentoManual==="Delivery"?TAXA_ENTREGA_MANGORA_ADMIN:0;
+  const total=subtotal+taxaEntrega;
   const pagamento=document.getElementById("pagamentoPedido").value;
   const observacao=document.getElementById("observacaoManual").value.trim();
 
@@ -126,7 +128,7 @@ window.finalizarPedido=async function(){
     cliente_nome:nome,telefone,endereco,
     tipo_atendimento:atendimentoManual,
     comanda,pagamento,observacao,
-    origem:"Pedido Manual",total
+    origem:"Pedido Manual",taxa_entrega:taxaEntrega,total
   };
 
   const itens=carrinho.map(i=>({

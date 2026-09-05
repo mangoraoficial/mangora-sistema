@@ -152,6 +152,7 @@ function normalizarPedido(p){
   pedido.telefone = pedido.telefone || "";
   pedido.endereco = pedido.endereco || "";
   pedido.pagamento = pedido.pagamento || "Não informado";
+  pedido.taxaEntrega = Number(pedido.taxaEntrega || pedido.taxa_entrega || 0);
   pedido.data = pedido.data || new Date().toLocaleString("pt-BR");
 
   return pedido;
@@ -426,8 +427,10 @@ function mostrarCarrinho(){
   carrinho.forEach((item,idx)=>{
     tabela.innerHTML+=`<tr><td><strong>${item.nome}</strong>${item.detalhes?`<div class="detalhes-pedido-admin">${item.detalhes}</div>`:""}</td><td>${item.quantidade}</td><td>${item.total>0?moeda(item.total):"A definir"}</td><td><button onclick="removerCarrinhoManual(${idx})">Remover</button></td></tr>`;
   });
-  const total=carrinho.reduce((s,i)=>s+Number(i.total||0),0);
-  totalEl.textContent=`Total: ${moeda(total)}`;
+  const subtotal=carrinho.reduce((s,i)=>s+Number(i.total||0),0);
+  const taxa=atendimentoManual==="Delivery" && carrinho.length ? TAXA_ENTREGA_MANGORA_ADMIN : 0;
+  const total=subtotal+taxa;
+  totalEl.innerHTML=`Subtotal: ${moeda(subtotal)}${taxa?`<br>Taxa de entrega: ${moeda(taxa)}`:""}<br><strong>Total: ${moeda(total)}</strong>`;
 }
 function removerCarrinhoManual(idx){carrinho.splice(idx,1);mostrarCarrinho();}
 
@@ -458,7 +461,9 @@ function finalizarPedido(){
     if(!comanda){alert("Informe a mesa ou comanda.");return;}
   }
 
-  const total=carrinho.reduce((s,i)=>s+Number(i.total||0),0);
+  const subtotal=carrinho.reduce((s,i)=>s+Number(i.total||0),0);
+  const taxaEntrega=atendimentoManual==="Delivery"?TAXA_ENTREGA_MANGORA_ADMIN:0;
+  const total=subtotal+taxaEntrega;
   const pagamento=document.getElementById("pagamentoPedido").value;
   const observacao=document.getElementById("observacaoManual").value.trim();
 
@@ -466,7 +471,7 @@ function finalizarPedido(){
   pedidos.push({
     id:Date.now(),numeroPedido,cliente:nome,telefone,endereco,
     comanda,tipoAtendimento:atendimentoManual,
-    itens:JSON.parse(JSON.stringify(carrinho)),total,pagamento,
+    itens:JSON.parse(JSON.stringify(carrinho)),taxaEntrega,total,pagamento,
     observacao,status:"Recebido",origem:"Pedido Manual",
     data:new Date().toLocaleString("pt-BR")
   });
@@ -498,6 +503,7 @@ const opcoesManual={
  temperos:["Chamoy","Tajín","Limão","Pimenta em pó","Sal rosa","Lemon Pepper","Páprica doce","Páprica picante"],
  coberturas:["Leite condensado","Mel","Creme Ninho","Iogurte natural","Creme de chocolate","Creme de maracujá"]
 };
+const TAXA_ENTREGA_MANGORA_ADMIN=5;
 let atendimentoManual="Delivery";
 
 function selecionarAtendimentoManual(tipo){
@@ -507,6 +513,7 @@ function selecionarAtendimentoManual(tipo){
  document.getElementById("dadosMesaManual").style.display=mesa?"grid":"none";
  document.getElementById("btnManualDelivery").classList.toggle("ativo",!mesa);
  document.getElementById("btnManualMesa").classList.toggle("ativo",mesa);
+ mostrarCarrinho();
 }
 function abrirProdutoManual(tipo){
  const monte=tipo==="monte";
@@ -1009,6 +1016,7 @@ function imprimirPedido(id){
  @media screen{body{margin:10px auto}}@media print{html,body{width:54mm}}</style></head><body>
  <div class="c"><div class="marca">MANGORA</div><div class="sub">FRUTAS TEMPERADAS</div></div><div class="linha"></div>
  <div class="c pedido">PEDIDO ${referenciaPedido(p)}</div><div class="c">${p.data||""}</div><div class="tipo">${atendimento}</div>${dados}<div class="linha"></div>${itens}<div class="linha"></div>
+ ${(()=>{const subtotal=(p.itens||[]).reduce((s,i)=>s+Number(i.total||0),0),taxa=Number(p.taxaEntrega||0);return `<div><b>Subtotal:</b> ${moeda(subtotal)}</div>${taxa>0?`<div><b>Taxa de entrega:</b> ${moeda(taxa)}</div>`:""}`})()}
  <div class="total"><span>TOTAL</span><span>${moeda(p.total)}</span></div><div><b>Pagamento:</b> ${p.pagamento||"-"}</div><div><b>Status:</b> ${p.status||"-"}</div>
  ${p.observacao?`<div class="obs"><b>OBS:</b><br>${p.observacao}</div>`:""}<div class="linha"></div><div class="rod">MANGORA - FRUTAS TEMPERADAS</div><div style="height:8mm"></div>
  <script>window.onload=function(){setTimeout(function(){window.print()},300)};<\/script></body></html>`);w.document.close();

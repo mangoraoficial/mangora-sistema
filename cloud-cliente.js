@@ -54,7 +54,9 @@ window.enviarPedido=async function(){
   const botao=document.querySelector('#formPedido button[onclick="enviarPedido()"]');
   if(botao){botao.disabled=true;botao.textContent="Enviando pedido...";}
 
-  const total=carrinho.reduce((s,i)=>s+Number(i.total||0),0);
+  const subtotal=carrinho.reduce((s,i)=>s+Number(i.total||0),0);
+  const taxaEntrega=TAXA_ENTREGA_MANGORA;
+  const total=subtotal+taxaEntrega;
 
   const dadosPedido={
     cliente_nome:nome,
@@ -64,6 +66,7 @@ window.enviarPedido=async function(){
     pagamento,
     observacao,
     origem:"Cliente",
+    taxa_entrega:taxaEntrega,
     total
   };
 
@@ -91,6 +94,17 @@ window.enviarPedido=async function(){
     document.getElementById("numeroPedido").textContent=
       `Pedido Nº ${String(criado.numero_pedido||criado.pedido_id).padStart(3,"0")}`;
     document.getElementById("statusPedido").textContent="🟢 Recebido";
+
+    const resumoPagamento=document.getElementById("resumoPagamentoConfirmacao");
+    if(resumoPagamento){
+      if(pagamento==="Pix"){
+        resumoPagamento.style.display="grid";
+        resumoPagamento.innerHTML=`<strong>Pagamento por PIX</strong><span>Total do pedido: <b>${moeda(total)}</b></span><span>Chave PIX (celular): <b>${CHAVE_PIX_MANGORA}</b></span><button type="button" class="btn-copiar-pix" onclick="copiarChavePix()">Copiar chave PIX</button><small>O pagamento será confirmado pela loja.</small>`;
+      }else{
+        resumoPagamento.style.display="grid";
+        resumoPagamento.innerHTML=`<strong>Forma de pagamento: ${pagamento}</strong><span>Total do pedido: <b>${moeda(total)}</b></span>`;
+      }
+    }
 
     carrinho=[];
     atualizarCarrinho();

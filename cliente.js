@@ -56,6 +56,8 @@ function feedbackBotaoAdicionar(botao){
 let produtos = lerProdutos();
 let carrinho = [];
 let ultimoPedido = null;
+const TAXA_ENTREGA_MANGORA = 5;
+const CHAVE_PIX_MANGORA = "43999649635";
 const opcoesMonte={frutas:["Manga","Abacaxi","Morango","Kiwi"],temperos:["Chamoy","Tajín","Limão","Pimenta em pó","Sal rosa","Lemon Pepper","Páprica doce","Páprica picante"],coberturas:["Leite condensado","Mel","Creme Ninho","Iogurte natural","Creme de chocolate","Creme de maracujá"]};
 function lerConfigMonte(){try{return JSON.parse(localStorage.getItem("mangora_config_monte"))||{preco400:0,preco500:0,adicionalFruta:0,adicionalTempero:0,adicionalCobertura:0};}catch(e){return {preco400:0,preco500:0,adicionalFruta:0,adicionalTempero:0,adicionalCobertura:0};}}
 const receitasCarte=[
@@ -69,6 +71,18 @@ const receitasCarte=[
  {id:"fit",nome:"Mangora Fit",emoji:"🌿",descricao:"Morango + kiwi + manga + iogurte natural + mel"},
  {id:"paixao",nome:"Mangora Paixão",emoji:"💛",descricao:"Morango + kiwi + manga + creme de maracujá"}
 ];
+
+const imagensCarte={
+ classico:"img/produtos/classico.webp",
+ mexicano:"img/produtos/mexicano.webp",
+ fresh:"img/produtos/fresh.webp",
+ picante:"img/produtos/picante.webp",
+ tropical:"img/produtos/tropical.webp",
+ tentacao:"img/produtos/tentacao.webp",
+ deuses:"img/produtos/deuses.webp",
+ fit:"img/produtos/fit.webp",
+ paixao:"img/produtos/paixao.webp"
+};
 
 function lerPrecosCarte(){
  try{return JSON.parse(localStorage.getItem("mangora_precos_carte"))||{};}catch(e){return {};}
@@ -198,19 +212,21 @@ function removerItem(id){
 
 function atualizarCarrinho(){
   const area = document.getElementById("itensCarrinho");
+  const campoSubtotal = document.getElementById("valorSubtotal");
+  const campoEntrega = document.getElementById("valorEntrega");
   const campoTotal = document.getElementById("valorTotal");
   if(!area || !campoTotal) return;
 
   area.innerHTML = "";
 
-  let total = 0;
+  let subtotal = 0;
 
   if(carrinho.length === 0){
     area.innerHTML = "<p>Carrinho vazio.</p>";
   }
 
   carrinho.forEach(item => {
-    total += Number(item.total || 0);
+    subtotal += Number(item.total || 0);
 
     area.innerHTML += `
       <div class="item-carrinho">
@@ -223,6 +239,10 @@ function atualizarCarrinho(){
     `;
   });
 
+  const taxaEntrega = carrinho.length ? TAXA_ENTREGA_MANGORA : 0;
+  const total = subtotal + taxaEntrega;
+  if(campoSubtotal) campoSubtotal.textContent = `Subtotal: ${moeda(subtotal)}`;
+  if(campoEntrega) campoEntrega.textContent = `Taxa de entrega: ${moeda(taxaEntrega)}`;
   campoTotal.textContent = `Total: ${moeda(total)}`;
 
   atualizarContadoresCarrinho();
@@ -234,8 +254,10 @@ function renderizarCarte(){
  const precos=lerPrecosCarte();
  area.innerHTML=receitasCarte.map(r=>{
    const p400=Number(precos[r.id]?.p400||0), p500=Number(precos[r.id]?.p500||0);
-   return `<article class="produto-carte">
-     <div class="produto-carte-emoji">${r.emoji}</div>
+   return `<article class="produto-carte produto-carte-com-imagem">
+     <div class="produto-carte-imagem-wrap">
+       <img class="produto-carte-imagem" src="${imagensCarte[r.id]||''}" alt="${r.nome}" loading="lazy">
+     </div>
      <div class="produto-carte-info"><h3>${r.nome}</h3><p>${r.descricao}</p>
        <div class="tamanhos-carte">
          <button onclick="adicionarCarte('${r.id}','400')">400 ml <strong>${p400>0?moeda(p400):"Preço a definir"}</strong></button>
@@ -303,7 +325,26 @@ function abrirFormulario(){
 
   const form = document.getElementById("formPedido");
   form.style.display = "block";
+  atualizarPagamentoCliente();
   form.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function atualizarPagamentoCliente(){
+  const pagamento=document.getElementById("pagamento")?.value;
+  const box=document.getElementById("boxPixCliente");
+  if(box) box.style.display=pagamento==="Pix"?"grid":"none";
+}
+
+async function copiarChavePix(){
+  try{
+    await navigator.clipboard.writeText(CHAVE_PIX_MANGORA);
+    mostrarToastCliente("Chave PIX copiada ✓");
+  }catch(e){
+    const el=document.createElement("textarea");
+    el.value=CHAVE_PIX_MANGORA;
+    document.body.appendChild(el);el.select();document.execCommand("copy");el.remove();
+    mostrarToastCliente("Chave PIX copiada ✓");
+  }
 }
 
 function enviarPedido(){

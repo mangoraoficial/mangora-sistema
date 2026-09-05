@@ -118,6 +118,7 @@ function pedidoCloudParaLocal(p){
     observacao:p.observacao||"",
     status:p.status||"Recebido",
     origem:p.origem||"Cliente",
+    taxaEntrega:Number(p.taxa_entrega||0),
     total:Number(p.total||0),
     motivoCancelamento:p.motivo_cancelamento||"",
     canceladoEm:p.cancelado_em ? new Date(p.cancelado_em).toLocaleString("pt-BR") : "",

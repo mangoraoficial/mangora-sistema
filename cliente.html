@@ -5,6 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mangora - Faça seu pedido</title>
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Mangora V19 - imagens do cardápio; sem alterar lógica de pedidos */
+    #listaProdutos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:stretch}
+    .produto-carte-com-imagem{display:flex;flex-direction:column;overflow:hidden;padding:0!important;background:#fff;border-radius:18px;border:1px solid rgba(20,92,42,.14);box-shadow:0 8px 24px rgba(28,69,38,.08)}
+    .produto-carte-imagem-wrap{width:100%;aspect-ratio:1/1;overflow:hidden;background:#f6f7f2;border-bottom:1px solid rgba(20,92,42,.10)}
+    .produto-carte-imagem{width:100%;height:100%;display:block;object-fit:cover;transition:transform .25s ease}
+    .produto-carte-com-imagem:hover .produto-carte-imagem{transform:scale(1.02)}
+    .produto-carte-com-imagem .produto-carte-info{padding:16px;display:flex;flex-direction:column;flex:1}
+    .produto-carte-com-imagem .produto-carte-info h3{margin:0 0 7px}.produto-carte-com-imagem .produto-carte-info p{margin:0 0 14px;line-height:1.45;flex:1}
+    .produto-carte-com-imagem .tamanhos-carte{margin-top:auto}
+    .monte-vitrine{max-width:700px;margin:0 auto 20px;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(28,69,38,.10)}
+    .monte-vitrine img{display:block;width:100%;height:auto}
+    @media(max-width:900px){#listaProdutos{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:600px){#listaProdutos{grid-template-columns:1fr;gap:16px}.produto-carte-com-imagem{max-width:430px;width:100%;margin:0 auto}.produto-carte-imagem-wrap{aspect-ratio:4/3}.monte-vitrine{border-radius:14px}}
+  </style>
+
+  <style>
+    .resumo-valores-entrega{margin:14px 0;padding:12px 14px;border:1px solid #d9e6d5;border-radius:14px;background:#fbfdf8;line-height:1.7}
+    .resumo-valores-entrega h3{margin:4px 0 0}
+    .pix-box-cliente,.pix-confirmacao{margin:12px 0;padding:14px;border:1px solid #b9d6b2;border-radius:14px;background:#f3faef;display:grid;gap:8px}
+    .pix-chave-linha{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .pix-chave-linha code{font-size:16px;font-weight:800;padding:8px 10px;background:#fff;border:1px dashed #7aad6d;border-radius:10px}
+    .btn-copiar-pix{border:0;border-radius:10px;padding:9px 12px;background:#1f7a35;color:#fff;font-weight:800;cursor:pointer}
+  </style>
 </head>
 <body class="site-cliente">
 
@@ -25,7 +50,7 @@
         <button class="modo-card" id="btnMonte" onclick="abrirModo('monte')"><strong>🥭 Monte do Seu Jeito</strong><span>Escolha tamanho, frutas, temperos e coberturas.</span></button>
       </div>
     </section>
-    <section id="areaMonte" class="configurador" style="display:none;"><h2>Monte do Seu Jeito</h2>
+    <section id="areaMonte" class="configurador" style="display:none;"><h2>Monte do Seu Jeito</h2><div class="monte-vitrine"><img src="img/produtos/monte-seu-jeito.webp" alt="Monte do Seu Jeito" loading="lazy"></div>
       <div class="passo"><h3>1. Tamanho</h3><label><input type="radio" name="tamanhoMonte" value="400" checked onchange="atualizarResumoMonte()"> 400 ml</label> <label><input type="radio" name="tamanhoMonte" value="500" onchange="atualizarResumoMonte()"> 500 ml</label></div>
       <div class="passo"><h3>2. Frutas <small>até 2 inclusas</small></h3><div id="opcoesFrutas" class="grade-opcoes"></div></div>
       <div class="passo"><h3>3. Temperos <small>até 3 inclusos</small></h3><div id="opcoesTemperos" class="grade-opcoes"></div></div>
@@ -40,7 +65,11 @@
         <p>Carrinho vazio.</p>
       </div>
 
-      <h3 id="valorTotal">Total: R$ 0,00</h3>
+      <div class="resumo-valores-entrega">
+        <div id="valorSubtotal">Subtotal: R$ 0,00</div>
+        <div id="valorEntrega">Taxa de entrega: R$ 0,00</div>
+        <h3 id="valorTotal">Total: R$ 0,00</h3>
+      </div>
 
       <button class="cliente-acao" onclick="abrirFormulario()">Finalizar pedido</button>
     </section>
@@ -52,11 +81,22 @@
       <input id="telefone" placeholder="WhatsApp">
       <input id="endereco" placeholder="Endereço">
 
-      <select id="pagamento">
-        <option value="Pix">Pix</option>
+      <label for="pagamento"><strong>Forma de pagamento</strong></label>
+      <select id="pagamento" onchange="atualizarPagamentoCliente()">
+        <option value="Pix">PIX</option>
         <option value="Dinheiro">Dinheiro</option>
         <option value="Cartão">Cartão</option>
       </select>
+
+      <div id="boxPixCliente" class="pix-box-cliente">
+        <strong>Pagamento por PIX</strong>
+        <span>Chave PIX (celular):</span>
+        <div class="pix-chave-linha">
+          <code id="chavePixCliente">43999649635</code>
+          <button type="button" class="btn-copiar-pix" onclick="copiarChavePix()">Copiar chave</button>
+        </div>
+        <small>Após enviar o pedido, realize o PIX. A confirmação do pagamento é feita pela loja.</small>
+      </div>
 
       <textarea id="observacao" placeholder="Observações do pedido"></textarea>
 
@@ -67,6 +107,7 @@
       <h2>🥭 Pedido recebido!</h2>
       <h3 id="numeroPedido"></h3>
       <div class="status-box" id="statusPedido">🟢 Recebido</div>
+      <div id="resumoPagamentoConfirmacao" class="pix-confirmacao" style="display:none;"></div>
 
       <button class="cliente-acao" style="margin-top:14px;" onclick="acompanharPedido()">
         Acompanhar meu pedido
