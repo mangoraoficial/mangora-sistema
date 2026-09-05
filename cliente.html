@@ -51,6 +51,13 @@ body.pedido-concluido-v23 .hero-cliente,body.pedido-concluido-v23 #secaoModoPedi
 body.pedido-concluido-v23 .cliente-main{padding-top:20px}
 @media(max-width:600px){.confirmacao-resumo-v23{grid-template-columns:1fr}.acoes-confirmacao-v23{grid-template-columns:1fr}.confirmacao-pedido-v23{margin:16px 0;padding:22px 14px!important}}
 </style>
+<style>
+.monte-v24-cabecalho{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px;padding:18px;border-radius:16px;background:#f7fbf4;border:1px solid rgba(21,91,42,.15)}
+.monte-v24-cabecalho h2{margin:3px 0 5px}.monte-v24-cabecalho p{margin:0;color:#667069}.monte-v24-kicker{font-size:11px;font-weight:900;letter-spacing:.08em;color:#f47b20}.monte-v24-a-partir{white-space:nowrap;background:#155b2a;color:#fff;padding:9px 12px;border-radius:10px}
+.monte-v24 .opcao-check{position:relative}.monte-v24 .opcao-check span{display:flex;justify-content:space-between;gap:8px;width:100%}.preco-adicional-v24{font-weight:900;color:#155b2a}
+.resumo-monte-v24 #precoMonte{display:block;font-size:22px;color:#155b2a;margin:12px 0}
+@media(max-width:600px){.monte-v24-cabecalho{flex-direction:column}.monte-v24-a-partir{white-space:normal}}
+</style>
 </head>
 <body class="site-cliente">
 
@@ -68,15 +75,40 @@ body.pedido-concluido-v23 .cliente-main{padding-top:20px}
     <section id="secaoModoPedido"><h2>Como você quer pedir?</h2>
       <div class="modo-pedido">
         <button class="modo-card ativo" id="btnCarte" onclick="abrirModo('carte')"><strong>🍍 À la Carte</strong><span>Escolha uma das combinações prontas da Mangora.</span></button>
-        <button class="modo-card" id="btnMonte" onclick="abrirModo('monte')"><strong>🥭 Monte do Seu Jeito</strong><span>Escolha tamanho, frutas, temperos e coberturas.</span></button>
+        <button class="modo-card" id="btnMonte" onclick="abrirModo('monte')"><strong>🥭 Monte do Seu Jeito</strong><span>500 ml • escolha os ingredientes e monte sua combinação.</span></button>
       </div>
     </section>
-    <section id="areaMonte" class="configurador" style="display:none;"><h2>Monte do Seu Jeito</h2><div class="monte-vitrine"><img src="img/produtos/monte-seu-jeito.webp" alt="Monte do Seu Jeito" loading="lazy"></div>
-      <div class="passo"><h3>1. Tamanho</h3><label><input type="radio" name="tamanhoMonte" value="400" checked onchange="atualizarResumoMonte()"> 400 ml</label> <label><input type="radio" name="tamanhoMonte" value="500" onchange="atualizarResumoMonte()"> 500 ml</label></div>
-      <div class="passo"><h3>2. Frutas <small>até 2 inclusas</small></h3><div id="opcoesFrutas" class="grade-opcoes"></div></div>
-      <div class="passo"><h3>3. Temperos <small>até 3 inclusos</small></h3><div id="opcoesTemperos" class="grade-opcoes"></div></div>
-      <div class="passo"><h3>4. Coberturas <small>até 2 inclusas</small></h3><div id="opcoesCoberturas" class="grade-opcoes"></div></div>
-      <div class="resumo-monte"><h3>Resumo</h3><div id="resumoMonte"></div><strong id="precoMonte"></strong><button class="cliente-acao" onclick="adicionarMonteCarrinho()">Adicionar ao carrinho</button></div>
+    <section id="areaMonte" class="configurador monte-v24" style="display:none;">
+      <div class="monte-v24-cabecalho">
+        <div>
+          <span class="monte-v24-kicker">PERSONALIZE SEU COPO</span>
+          <h2>🥭 Monte do Seu Jeito</h2>
+          <p>500 ml • Base R$ 5,00 • escolha pelo menos 1 fruta</p>
+        </div>
+        <strong class="monte-v24-a-partir">A partir de R$ 12,00</strong>
+      </div>
+
+      <div class="passo">
+        <h3>1. Frutas <small>obrigatório escolher pelo menos 1</small></h3>
+        <div id="opcoesFrutas" class="grade-opcoes"></div>
+      </div>
+
+      <div class="passo">
+        <h3>2. Temperos <small>R$ 2,00 cada • escolha quantos quiser</small></h3>
+        <div id="opcoesTemperos" class="grade-opcoes"></div>
+      </div>
+
+      <div class="passo">
+        <h3>3. Caldas e cremes <small>escolha quantos quiser</small></h3>
+        <div id="opcoesCoberturas" class="grade-opcoes"></div>
+      </div>
+
+      <div class="resumo-monte resumo-monte-v24">
+        <h3>Seu copo de 500 ml</h3>
+        <div id="resumoMonte"></div>
+        <strong id="precoMonte"></strong>
+        <button class="cliente-acao" onclick="adicionarMonteCarrinho()">Adicionar ao carrinho</button>
+      </div>
     </section>
     <section id="areaCarte"><h2>À la Carte</h2><div id="listaProdutos"></div></section>
 

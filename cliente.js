@@ -59,6 +59,13 @@ let ultimoPedido = null;
 const TAXA_ENTREGA_MANGORA = 5;
 let tipoRecebimentoCliente = "Delivery";
 const CHAVE_PIX_MANGORA = "43999649635";
+const MONTE_V24={
+  tamanho:"500",
+  base:5,
+  frutas:{"Manga":7,"Abacaxi":7,"Kiwi":8,"Morango":8},
+  temperos:{"Chamoy":2,"Tajín":2,"Limão":2,"Pimenta em pó":2,"Sal rosa":2,"Lemon Pepper":2,"Páprica doce":2,"Páprica picante":2},
+  coberturas:{"Leite condensado":3,"Creme Ninho":5,"Creme de chocolate":5,"Creme de maracujá":5,"Mel":5,"Iogurte natural":5}
+};
 const opcoesMonte={frutas:["Manga","Abacaxi","Morango","Kiwi"],temperos:["Chamoy","Tajín","Limão","Pimenta em pó","Sal rosa","Lemon Pepper","Páprica doce","Páprica picante"],coberturas:["Leite condensado","Mel","Creme Ninho","Iogurte natural","Creme de chocolate","Creme de maracujá"]};
 function lerConfigMonte(){try{return JSON.parse(localStorage.getItem("mangora_config_monte"))||{preco400:0,preco500:0,adicionalFruta:0,adicionalTempero:0,adicionalCobertura:0};}catch(e){return {preco400:0,preco500:0,adicionalFruta:0,adicionalTempero:0,adicionalCobertura:0};}}
 const receitasCarte=[
@@ -311,12 +318,42 @@ function abrirModo(modo){
   if(btnMonte) btnMonte.classList.toggle("ativo", mostrarMonte);
   if(btnCarte) btnCarte.classList.toggle("ativo", !mostrarMonte);
 }
-function renderizarGrupo(id,g,itens){document.getElementById(id).innerHTML=itens.map(n=>`<label class="opcao-check"><input type="checkbox" data-grupo="${g}" value="${n}" onchange="atualizarResumoMonte()"><span>${n}</span></label>`).join("");}
-function renderizarOpcoesMonte(){renderizarGrupo("opcoesFrutas","frutas",opcoesMonte.frutas);renderizarGrupo("opcoesTemperos","temperos",opcoesMonte.temperos);renderizarGrupo("opcoesCoberturas","coberturas",opcoesMonte.coberturas);}
+function precoItemMonteV24(grupo,nome){
+  return Number(MONTE_V24[grupo]?.[nome]||0);
+}
+function renderizarGrupo(id,g,itens){
+  const area=document.getElementById(id); if(!area)return;
+  area.innerHTML=itens.map(n=>{
+    const valor=precoItemMonteV24(g,n);
+    return `<label class="opcao-check"><input type="checkbox" data-grupo="${g}" value="${n}" onchange="atualizarResumoMonte()"><span><span>${n}</span><b class="preco-adicional-v24">+ ${moeda(valor)}</b></span></label>`;
+  }).join("");
+}
+function renderizarOpcoesMonte(){
+  renderizarGrupo("opcoesFrutas","frutas",opcoesMonte.frutas);
+  renderizarGrupo("opcoesTemperos","temperos",opcoesMonte.temperos);
+  renderizarGrupo("opcoesCoberturas","coberturas",opcoesMonte.coberturas);
+}
 function selecionados(g){return [...document.querySelectorAll(`input[data-grupo="${g}"]:checked`)].map(e=>e.value);}
-function calcularMonte(){const tamanho=document.querySelector('input[name="tamanhoMonte"]:checked')?.value||"400",frutas=selecionados("frutas"),temperos=selecionados("temperos"),coberturas=selecionados("coberturas"),c=lerConfigMonte(),ef=Math.max(0,frutas.length-2),et=Math.max(0,temperos.length-3),ec=Math.max(0,coberturas.length-2),base=tamanho==="500"?Number(c.preco500||0):Number(c.preco400||0);return {tamanho,frutas,temperos,coberturas,extrasFrutas:ef,extrasTemperos:et,extrasCoberturas:ec,total:base+ef*Number(c.adicionalFruta||0)+et*Number(c.adicionalTempero||0)+ec*Number(c.adicionalCobertura||0)};}
-function atualizarResumoMonte(){const r=calcularMonte(),a=document.getElementById("resumoMonte"),p=document.getElementById("precoMonte");if(!a||!p)return;a.innerHTML=`<p><strong>${r.tamanho} ml</strong></p><p>Frutas: ${r.frutas.join(", ")||"Nenhuma"} ${r.extrasFrutas?`(+${r.extrasFrutas} extra)`:""}</p><p>Temperos: ${r.temperos.join(", ")||"Nenhum"} ${r.extrasTemperos?`(+${r.extrasTemperos} extra)`:""}</p><p>Coberturas: ${r.coberturas.join(", ")||"Nenhuma"} ${r.extrasCoberturas?`(+${r.extrasCoberturas} extra)`:""}</p>`;p.textContent=r.total>0?`Total: ${moeda(r.total)}`:"Preço a definir";}
-function adicionarMonteCarrinho(){const r=calcularMonte();if(!r.frutas.length){alert("Escolha pelo menos uma fruta.");return;}if(Number(r.total||0)<=0){alert("Este tamanho está temporariamente indisponível porque o preço ainda não foi configurado.");return;}const detalhes=`Frutas: ${r.frutas.join(", ")} | Temperos: ${r.temperos.join(", ")||"sem tempero"} | Coberturas: ${r.coberturas.join(", ")||"sem cobertura"}`;carrinho.push({id:Date.now(),produtoId:null,nome:`Monte do Seu Jeito - ${r.tamanho} ml`,detalhes,preco:r.total,quantidade:1,total:r.total,personalizado:true,montagem:r});atualizarCarrinho();mostrarToastCliente("Adicionado ao carrinho ✓");}
+function calcularMonte(){
+  const frutas=selecionados("frutas"),temperos=selecionados("temperos"),coberturas=selecionados("coberturas");
+  const soma=(grupo,lista)=>lista.reduce((t,n)=>t+precoItemMonteV24(grupo,n),0);
+  const total=MONTE_V24.base+soma("frutas",frutas)+soma("temperos",temperos)+soma("coberturas",coberturas);
+  return {tamanho:"500",frutas,temperos,coberturas,base:MONTE_V24.base,total};
+}
+function atualizarResumoMonte(){
+  const r=calcularMonte(),a=document.getElementById("resumoMonte"),p=document.getElementById("precoMonte");if(!a||!p)return;
+  const linha=(grupo,lista,vazio)=>lista.length?lista.map(n=>`${n} (+${moeda(precoItemMonteV24(grupo,n))})`).join(", "):vazio;
+  a.innerHTML=`<p><strong>Base 500 ml: ${moeda(r.base)}</strong></p><p>Frutas: ${linha("frutas",r.frutas,"Escolha pelo menos 1 fruta")}</p><p>Temperos: ${linha("temperos",r.temperos,"Nenhum")}</p><p>Caldas e cremes: ${linha("coberturas",r.coberturas,"Nenhum")}</p>`;
+  p.textContent=`Total: ${moeda(r.total)}`;
+}
+function adicionarMonteCarrinho(){
+  const r=calcularMonte();
+  if(!r.frutas.length){alert("Escolha pelo menos uma fruta para montar seu copo.");return;}
+  const detalhes=`Base 500 ml: ${moeda(r.base)} | Frutas: ${r.frutas.join(", ")} | Temperos: ${r.temperos.join(", ")||"sem tempero"} | Caldas e cremes: ${r.coberturas.join(", ")||"sem cobertura"}`;
+  carrinho.push({id:Date.now(),produtoId:null,nome:"Monte do Seu Jeito - 500 ml",detalhes,preco:r.total,quantidade:1,total:r.total,personalizado:true,montagem:r});
+  document.querySelectorAll('#areaMonte input[type="checkbox"]:checked').forEach(x=>x.checked=false);
+  atualizarResumoMonte();atualizarCarrinho();mostrarToastCliente("Monte do Seu Jeito adicionado ao carrinho ✓");
+}
 
 function selecionarTipoRecebimento(tipo){
   tipoRecebimentoCliente = tipo==="Retirada na loja" ? "Retirada na loja" : "Delivery";
