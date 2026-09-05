@@ -40,6 +40,17 @@
     #campoEnderecoCliente input{width:100%}
     @media(max-width:520px){.tipo-recebimento-botoes{grid-template-columns:1fr}}
   </style>
+<style>
+.confirmacao-pedido-v23{max-width:620px;margin:28px auto;padding:26px 20px!important;text-align:center;border-radius:22px;background:linear-gradient(180deg,#fffdf6,#f4faef);border:1px solid rgba(21,91,42,.16);box-shadow:0 14px 38px rgba(28,69,38,.12)}
+.confirmacao-check{width:64px;height:64px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:#1f7a35;color:#fff;font-size:34px;font-weight:900}
+.confirmacao-kicker{display:block;font-size:11px;font-weight:900;letter-spacing:.08em;color:#f47b20;margin-bottom:7px}
+.confirmacao-pedido-v23 h2{margin:0 0 5px;color:#155b2a}.numero-pedido-destaque{font-size:25px;margin:8px 0;color:#253a2a}.confirmacao-texto{color:#667069;margin:0 auto 18px;max-width:470px}
+.confirmacao-resumo-v23{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}.confirmacao-resumo-v23>div{background:#fff;border:1px solid #dbe7d8;border-radius:13px;padding:12px 9px}.confirmacao-resumo-v23 span{display:block;font-size:11px;color:#727d75;margin-bottom:5px}.confirmacao-resumo-v23 strong{display:block;color:#17351f;font-size:14px}
+.acoes-confirmacao-v23{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.cliente-acao-secundaria{background:#fff!important;color:#155b2a!important;border:1px solid #155b2a!important}
+body.pedido-concluido-v23 .hero-cliente,body.pedido-concluido-v23 #secaoModoPedido,body.pedido-concluido-v23 #areaMonte,body.pedido-concluido-v23 #areaCarte,body.pedido-concluido-v23 #secaoCarrinho,body.pedido-concluido-v23 #formPedido,body.pedido-concluido-v23 #carrinhoFlutuante{display:none!important}
+body.pedido-concluido-v23 .cliente-main{padding-top:20px}
+@media(max-width:600px){.confirmacao-resumo-v23{grid-template-columns:1fr}.acoes-confirmacao-v23{grid-template-columns:1fr}.confirmacao-pedido-v23{margin:16px 0;padding:22px 14px!important}}
+</style>
 </head>
 <body class="site-cliente">
 
@@ -54,7 +65,7 @@
 
   <main class="cliente-main">
 
-    <section><h2>Como você quer pedir?</h2>
+    <section id="secaoModoPedido"><h2>Como você quer pedir?</h2>
       <div class="modo-pedido">
         <button class="modo-card ativo" id="btnCarte" onclick="abrirModo('carte')"><strong>🍍 À la Carte</strong><span>Escolha uma das combinações prontas da Mangora.</span></button>
         <button class="modo-card" id="btnMonte" onclick="abrirModo('monte')"><strong>🥭 Monte do Seu Jeito</strong><span>Escolha tamanho, frutas, temperos e coberturas.</span></button>
@@ -69,7 +80,7 @@
     </section>
     <section id="areaCarte"><h2>À la Carte</h2><div id="listaProdutos"></div></section>
 
-    <section class="carrinho-box">
+    <section id="secaoCarrinho" class="carrinho-box">
       <h2>🛒 Seu carrinho</h2>
       <div id="itensCarrinho">
         <p>Carrinho vazio.</p>
@@ -124,15 +135,26 @@
       <button class="cliente-acao" onclick="enviarPedido()">Enviar pedido</button>
     </section>
 
-    <section id="confirmacaoPedido" class="confirmacao-box" style="display:none;">
-      <h2>🥭 Pedido recebido!</h2>
-      <h3 id="numeroPedido"></h3>
-      <div class="status-box" id="statusPedido">🟢 Recebido</div>
+    <section id="confirmacaoPedido" class="confirmacao-box confirmacao-pedido-v23" style="display:none;">
+      <div class="confirmacao-check">✓</div>
+      <span class="confirmacao-kicker">PEDIDO ENVIADO PARA A MANGORA</span>
+      <h2>Pedido realizado com sucesso!</h2>
+      <h3 id="numeroPedido" class="numero-pedido-destaque"></h3>
+      <p class="confirmacao-texto">Recebemos seu pedido e ele já foi enviado para a loja.</p>
+
+      <div class="confirmacao-resumo-v23">
+        <div><span>Recebimento</span><strong id="tipoRecebimentoConfirmacao">—</strong></div>
+        <div><span>Total</span><strong id="totalConfirmacao">R$ 0,00</strong></div>
+        <div><span>Pagamento</span><strong id="pagamentoConfirmacao">—</strong></div>
+      </div>
+
+      <div class="status-box" id="statusPedido">🟢 Pedido recebido</div>
       <div id="resumoPagamentoConfirmacao" class="pix-confirmacao" style="display:none;"></div>
 
-      <button class="cliente-acao" style="margin-top:14px;" onclick="acompanharPedido()">
-        Acompanhar meu pedido
-      </button>
+      <div class="acoes-confirmacao-v23">
+        <button class="cliente-acao" onclick="acompanharPedido()">📍 Acompanhar meu pedido</button>
+        <button class="cliente-acao cliente-acao-secundaria" onclick="fazerNovoPedido()">🥭 Fazer novo pedido</button>
+      </div>
     </section>
 
   </main>

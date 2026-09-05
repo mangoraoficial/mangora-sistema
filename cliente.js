@@ -498,9 +498,7 @@ function enviarPedido(){
   ultimoPedido = pedido.id;
 
   document.getElementById("formPedido").style.display = "none";
-  document.getElementById("confirmacaoPedido").style.display = "block";
-  document.getElementById("numeroPedido").textContent = `Pedido Nº ${String(pedido.numeroPedido).padStart(3,"0")}`;
-  document.getElementById("statusPedido").textContent = "🟢 Recebido";
+  exibirConfirmacaoPedidoV23({numero:pedido.numeroPedido,total:pedido.total,pagamento:pedido.pagamento,tipo:tipoRecebimentoCliente});
 
   carrinho = [];
   atualizarCarrinho();
@@ -514,6 +512,31 @@ function enviarPedido(){
 
   document.getElementById("confirmacaoPedido")
     .scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+function exibirConfirmacaoPedidoV23({numero,total,pagamento,tipo}){
+  document.body.classList.add("pedido-concluido-v23");
+  const confirmacao=document.getElementById("confirmacaoPedido");
+  if(confirmacao)confirmacao.style.display="block";
+  const n=document.getElementById("numeroPedido"); if(n)n.textContent=`Pedido Nº ${String(numero||"").padStart(3,"0")}`;
+  const t=document.getElementById("tipoRecebimentoConfirmacao"); if(t)t.textContent=tipo==="Retirada na loja"?"🏪 Retirada na loja":"🛵 Delivery";
+  const tt=document.getElementById("totalConfirmacao"); if(tt)tt.textContent=moeda(total||0);
+  const p=document.getElementById("pagamentoConfirmacao"); if(p)p.textContent=pagamento==="Pix"?"PIX • aguardando pagamento":pagamento||"—";
+  const st=document.getElementById("statusPedido"); if(st)st.textContent="🟢 Pedido recebido";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function fazerNovoPedido(){
+  document.body.classList.remove("pedido-concluido-v23");
+  const confirmacao=document.getElementById("confirmacaoPedido"); if(confirmacao)confirmacao.style.display="none";
+  const resumo=document.getElementById("resumoPagamentoConfirmacao"); if(resumo){resumo.style.display="none";resumo.innerHTML="";}
+  carrinho=[];
+  tipoRecebimentoCliente="Delivery";
+  selecionarTipoRecebimento("Delivery");
+  atualizarCarrinho();
+  ["nome","telefone","endereco","observacao"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  const pagamento=document.getElementById("pagamento"); if(pagamento)pagamento.selectedIndex=0;
+  atualizarPagamentoCliente(); abrirModo("carte"); window.scrollTo({top:0,behavior:"smooth"});
 }
 
 function acompanharPedido(){

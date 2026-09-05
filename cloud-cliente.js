@@ -90,10 +90,12 @@ window.enviarPedido=async function(){
     ultimoTrackingTokenCloud=criado.tracking_token;
 
     document.getElementById("formPedido").style.display="none";
-    document.getElementById("confirmacaoPedido").style.display="block";
-    document.getElementById("numeroPedido").textContent=
-      `Pedido Nº ${String(criado.numero_pedido||criado.pedido_id).padStart(3,"0")}`;
-    document.getElementById("statusPedido").textContent="🟢 Recebido";
+    exibirConfirmacaoPedidoV23({
+      numero:criado.numero_pedido||criado.pedido_id,
+      total,
+      pagamento,
+      tipo:tipoRecebimentoCliente
+    });
 
     const resumoPagamento=document.getElementById("resumoPagamentoConfirmacao");
     if(resumoPagamento){
@@ -113,7 +115,7 @@ window.enviarPedido=async function(){
       const el=document.getElementById(id); if(el)el.value="";
     });
     document.getElementById("pagamento").selectedIndex=0;
-    document.getElementById("confirmacaoPedido").scrollIntoView({behavior:"smooth",block:"center"});
+
   }catch(erro){
     console.error(erro);
     alert(`Não foi possível enviar o pedido.\n\n${erro.message}`);
