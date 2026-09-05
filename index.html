@@ -13,6 +13,8 @@
     .alerta-novo-pedido strong{display:block;color:#155b2a;font-size:15px;margin-bottom:3px}
     .alerta-novo-pedido span{color:#4d594f;font-size:12px}
     .alerta-novo-pedido button{border:0;background:transparent;font-size:26px;line-height:1;cursor:pointer;color:#6b4d22}
+      .monte-precos-identificados label{display:flex;flex-direction:column;gap:7px;color:#173f22;font-size:13px;}
+    .monte-precos-identificados input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #d8e3d5;border-radius:10px;background:#fff;font-size:15px;}
   </style>
 </head>
 <body class="admin-body">
@@ -164,21 +166,21 @@
           <div class="bloco">
             <h3>Monte do Seu Jeito — 500 ml</h3>
             <p class="texto-suave">Configure a base e o valor de cada ingrediente. O cliente precisa escolher pelo menos 1 fruta.</p>
-            <div class="formulario">
-              <input id="monteBase500" type="number" step="0.01" placeholder="Base 500 ml">
-              <input id="monteManga" type="number" step="0.01" placeholder="Manga">
-              <input id="monteAbacaxi" type="number" step="0.01" placeholder="Abacaxi">
-              <input id="monteKiwi" type="number" step="0.01" placeholder="Kiwi">
-              <input id="monteMorango" type="number" step="0.01" placeholder="Morango">
-              <input id="monteTempero" type="number" step="0.01" placeholder="Qualquer tempero">
-              <input id="monteLeiteCondensado" type="number" step="0.01" placeholder="Leite condensado">
-              <input id="monteCremeNinho" type="number" step="0.01" placeholder="Creme Ninho">
-              <input id="monteCremeChocolate" type="number" step="0.01" placeholder="Creme de chocolate">
-              <input id="monteCremeMaracuja" type="number" step="0.01" placeholder="Creme de maracujá">
-              <input id="monteMel" type="number" step="0.01" placeholder="Mel">
-              <input id="monteIogurte" type="number" step="0.01" placeholder="Iogurte natural">
-              <button onclick="salvarConfiguracaoMonte()">Salvar preços do Monte</button>
+            <div class="monte-precos-identificados" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:16px;">
+              <label><strong>Base / embalagem — 500 ml</strong><input id="monteBase500" type="number" step="0.01" placeholder="R$ 5,00"></label>
+              <label><strong>Manga</strong><input id="monteManga" type="number" step="0.01" placeholder="R$ 7,00"></label>
+              <label><strong>Abacaxi</strong><input id="monteAbacaxi" type="number" step="0.01" placeholder="R$ 7,00"></label>
+              <label><strong>Kiwi</strong><input id="monteKiwi" type="number" step="0.01" placeholder="R$ 8,00"></label>
+              <label><strong>Morango</strong><input id="monteMorango" type="number" step="0.01" placeholder="R$ 8,00"></label>
+              <label><strong>Qualquer tempero</strong><input id="monteTempero" type="number" step="0.01" placeholder="R$ 2,00"></label>
+              <label><strong>Leite condensado</strong><input id="monteLeiteCondensado" type="number" step="0.01" placeholder="R$ 3,00"></label>
+              <label><strong>Creme Ninho</strong><input id="monteCremeNinho" type="number" step="0.01" placeholder="R$ 5,00"></label>
+              <label><strong>Creme de chocolate</strong><input id="monteCremeChocolate" type="number" step="0.01" placeholder="R$ 5,00"></label>
+              <label><strong>Creme de maracujá</strong><input id="monteCremeMaracuja" type="number" step="0.01" placeholder="R$ 5,00"></label>
+              <label><strong>Mel</strong><input id="monteMel" type="number" step="0.01" placeholder="R$ 5,00"></label>
+              <label><strong>Iogurte natural</strong><input id="monteIogurte" type="number" step="0.01" placeholder="R$ 5,00"></label>
             </div>
+            <button style="margin-top:14px" onclick="salvarConfiguracaoMonte()">Salvar preços do Monte</button>
           </div>
           <div class="cards">
             <div class="card"><span>Tamanho</span><strong>500 ml</strong></div>
