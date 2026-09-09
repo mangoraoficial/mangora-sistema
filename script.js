@@ -994,38 +994,57 @@ function atualizarFinanceiro(){
 
 // ==================== DASHBOARD ====================
 
-function atualizarDashboard(){
-  const pedidosHoje = pedidos.filter(p=>!pedidoCancelado(p) && dentroPeriodo(p.data,"hoje"));
-  const vendas = pedidosHoje.reduce((soma,p) => soma + Number(p.total || 0),0);
-
-  const dPedidos = document.getElementById("dashPedidos");
-  const dVendas = document.getElementById("dashVendas");
-  const dClientes = document.getElementById("dashClientes");
-  const dProduto = document.getElementById("dashProduto");
-
-  if(dPedidos) dPedidos.textContent = pedidosHoje.length;
-  if(dVendas) dVendas.textContent = moeda(vendas);
-  if(dClientes) dClientes.textContent = clientes.length;
-
-  const ranking = {};
-
-  pedidosHoje.forEach(p => {
-    (p.itens || []).forEach(item => {
-      ranking[item.nome] = (ranking[item.nome] || 0) + Number(item.quantidade || 0);
+function produtoMaisVendido(listaPedidos){
+  const ranking={};
+  listaPedidos.forEach(p=>{
+    (p.itens||[]).forEach(item=>{
+      const nome=item.nome||"Produto";
+      ranking[nome]=(ranking[nome]||0)+Number(item.quantidade||1);
     });
   });
 
-  let maisVendido = "Nenhum";
-  let maior = 0;
-
-  Object.entries(ranking).forEach(([nome,qtd]) => {
-    if(qtd > maior){
-      maior = qtd;
-      maisVendido = nome;
-    }
+  let nome="Nenhum",qtd=0;
+  Object.entries(ranking).forEach(([produto,total])=>{
+    if(total>qtd){qtd=total;nome=produto;}
   });
+  return nome;
+}
 
-  if(dProduto) dProduto.textContent = maisVendido;
+function clientesAtendidos(listaPedidos){
+  const chaves=new Set();
+  listaPedidos.forEach(p=>{
+    const telefone=String(p.telefone||"").replace(/\D/g,"");
+    const nome=String(p.cliente||"").trim().toLowerCase();
+    const chave=telefone || nome;
+    if(chave)chaves.add(chave);
+  });
+  return chaves.size;
+}
+
+function atualizarDashboard(){
+  const validos=pedidos.filter(p=>!pedidoCancelado(p));
+  const hoje=validos.filter(p=>dentroPeriodo(p.data,"hoje"));
+  const mes=validos.filter(p=>dentroPeriodo(p.data,"mes"));
+
+  const vendasHoje=hoje.reduce((s,p)=>s+Number(p.total||0),0);
+  const vendasMes=mes.reduce((s,p)=>s+Number(p.total||0),0);
+  const ticketMes=mes.length ? vendasMes/mes.length : 0;
+
+  const mapaTexto={
+    dashPedidosHoje:hoje.length,
+    dashVendasHoje:moeda(vendasHoje),
+    dashClientesHoje:clientesAtendidos(hoje),
+    dashProdutoHoje:produtoMaisVendido(hoje),
+    dashPedidosMes:mes.length,
+    dashVendasMes:moeda(vendasMes),
+    dashTicketMes:moeda(ticketMes),
+    dashProdutoMes:produtoMaisVendido(mes)
+  };
+
+  Object.entries(mapaTexto).forEach(([id,valor])=>{
+    const el=document.getElementById(id);
+    if(el)el.textContent=valor;
+  });
 }
 
 // ==================== WHATSAPP / IMPRESSÃO ====================

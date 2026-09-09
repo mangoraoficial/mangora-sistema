@@ -16,6 +16,14 @@
       .monte-precos-identificados label{display:flex;flex-direction:column;gap:7px;color:#173f22;font-size:13px;}
     .monte-precos-identificados input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #d8e3d5;border-radius:10px;background:#fff;font-size:15px;}
   </style>
+
+  <style>
+    .dashboard-periodo{margin:6px 0 10px;display:flex;align-items:center;gap:10px}
+    .dashboard-periodo-mes{margin-top:20px}
+    .dashboard-periodo-titulo{font-size:11px;font-weight:900;letter-spacing:.08em;color:#f47b20}
+    .dashboard-periodo:after{content:"";height:1px;background:#e4ebe0;flex:1}
+  </style>
+
 </head>
 <body class="admin-body">
 
@@ -72,25 +80,53 @@
           </div>
         </div>
 
+        <div class="dashboard-periodo">
+          <span class="dashboard-periodo-titulo">HOJE</span>
+        </div>
         <div class="cards dashboard-cards">
           <div class="card dashboard-card card-pedidos">
-            <span>Pedidos</span>
-            <strong id="dashPedidos">0</strong>
+            <span>Pedidos hoje</span>
+            <strong id="dashPedidosHoje">0</strong>
           </div>
 
           <div class="card laranja dashboard-card card-vendas">
-            <span>Vendas</span>
-            <strong id="dashVendas">R$ 0,00</strong>
+            <span>Vendas hoje</span>
+            <strong id="dashVendasHoje">R$ 0,00</strong>
           </div>
 
           <div class="card amarelo dashboard-card card-clientes">
-            <span>Clientes</span>
-            <strong id="dashClientes">0</strong>
+            <span>Clientes atendidos hoje</span>
+            <strong id="dashClientesHoje">0</strong>
           </div>
 
           <div class="card dashboard-card card-destaque">
-            <span>Mais vendido</span>
-            <strong id="dashProduto">Nenhum</strong>
+            <span>Mais vendido hoje</span>
+            <strong id="dashProdutoHoje">Nenhum</strong>
+          </div>
+        </div>
+
+        <div class="dashboard-periodo dashboard-periodo-mes">
+          <span class="dashboard-periodo-titulo">MÊS ATUAL</span>
+        </div>
+        <div class="cards dashboard-cards">
+          <div class="card dashboard-card">
+            <span>Pedidos no mês</span>
+            <strong id="dashPedidosMes">0</strong>
+          </div>
+
+          <div class="card laranja dashboard-card">
+            <span>Faturamento no mês</span>
+            <strong id="dashVendasMes">R$ 0,00</strong>
+          </div>
+
+          <div class="card amarelo dashboard-card">
+            <span>Ticket médio</span>
+            <strong id="dashTicketMes">R$ 0,00</strong>
+          </div>
+
+          <div class="card dashboard-card card-destaque">
+            <span>Mais vendido no mês</span>
+            <strong id="dashProdutoMes">Nenhum</strong>
           </div>
         </div>
 
