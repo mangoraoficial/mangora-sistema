@@ -19,9 +19,11 @@ function atualizarIndicadorCloud(ok,texto){
 }
 
 async function sincronizarCatalogoCloudAdmin(){
-  const [precos,cfg]=await Promise.all([
+  const [precos,cfg,status,disponibilidade]=await Promise.all([
     cloudLerPrecos(true),
-    cloudLerConfigMonte(true)
+    cloudLerConfigMonte(true),
+    cloudLerStatusLoja(true),
+    cloudLerDisponibilidade(true)
   ]);
 
   if(precos && Object.keys(precos).length){
@@ -33,9 +35,16 @@ async function sincronizarCatalogoCloudAdmin(){
     localStorage.setItem("mangora_config_monte",JSON.stringify(cfg));
   }
 
+  statusLoja=status||{aberta:true,mensagem:""};
+  disponibilidadeCardapio=disponibilidade||{};
+  localStorage.setItem("mangora_status_loja",JSON.stringify(statusLoja));
+  localStorage.setItem("mangora_disponibilidade_cardapio",JSON.stringify(disponibilidadeCardapio));
+
   renderizarPrecosCarte();
   carregarConfiguracaoMonte();
   renderizarPedidoManual();
+  renderizarStatusLojaAdmin();
+  renderizarDisponibilidadeAdmin();
 }
 
 async function ativarAlertasPedidos(){
@@ -122,6 +131,47 @@ async function sincronizarPedidosCloud(){
     sincronizacaoCloudEmAndamento=false;
   }
 }
+
+
+window.alternarStatusLoja=async function(){
+  const novaAberta=!(statusLoja?.aberta!==false);
+  let mensagem=document.getElementById("mensagemLojaAdmin")?.value.trim()||"";
+  if(!novaAberta && !mensagem){
+    mensagem="Atendimento temporariamente pausado. Voltamos em breve.";
+  }
+
+  try{
+    await cloudSalvarStatusLoja({aberta:novaAberta,mensagem});
+    statusLoja={aberta:novaAberta,mensagem};
+    localStorage.setItem("mangora_status_loja",JSON.stringify(statusLoja));
+    renderizarStatusLojaAdmin();
+  }catch(erro){
+    alert(`Não foi possível alterar o status da loja.\n\n${erro.message}`);
+  }
+};
+
+window.alternarDisponibilidadeProduto=async function(chave){
+  const atual=disponibilidadeCardapio[chave]||{ativo:true,motivo:""};
+  const novoAtivo=atual.ativo===false;
+
+  let motivo="";
+  if(!novoAtivo){
+    const nome=nomesDisponibilidadeAdmin[chave]||chave;
+    const informado=prompt(`Pausar ${nome}?\n\nMotivo opcional:`,atual.motivo||"");
+    if(informado===null)return;
+    motivo=informado.trim();
+  }
+
+  try{
+    await cloudSalvarDisponibilidade(chave,novoAtivo,motivo);
+    disponibilidadeCardapio[chave]={ativo:novoAtivo,motivo};
+    localStorage.setItem("mangora_disponibilidade_cardapio",JSON.stringify(disponibilidadeCardapio));
+    renderizarDisponibilidadeAdmin();
+    renderizarPedidoManual();
+  }catch(erro){
+    alert(`Não foi possível alterar a disponibilidade.\n\n${erro.message}`);
+  }
+};
 
 window.salvarPrecosCarte=async function(){
   const p={};

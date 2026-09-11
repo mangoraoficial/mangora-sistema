@@ -7,9 +7,11 @@ let ultimoTrackingTokenCloud=null;
 
 async function carregarCatalogoCloudCliente(){
   try{
-    const [precos,cfg]=await Promise.all([
+    const [precos,cfg,status,disponibilidade]=await Promise.all([
       cloudLerPrecos(false),
-      cloudLerConfigMonte(false)
+      cloudLerConfigMonte(false),
+      cloudLerStatusLoja(false),
+      cloudLerDisponibilidade(false)
     ]);
 
     localStorage.setItem("mangora_precos_carte",JSON.stringify(precos||{}));
@@ -18,9 +20,16 @@ async function carregarCatalogoCloudCliente(){
       localStorage.setItem("mangora_config_monte",JSON.stringify(cfg));
     }
 
+    statusLojaCliente=status||{aberta:true,mensagem:""};
+    disponibilidadeCliente=disponibilidade||{};
+    localStorage.setItem("mangora_status_loja",JSON.stringify(statusLojaCliente));
+    localStorage.setItem("mangora_disponibilidade_cardapio",JSON.stringify(disponibilidadeCliente));
+
     renderizarCarte();
     renderizarOpcoesMonte();
     atualizarResumoMonte();
+    aplicarStatusLojaCliente();
+    aplicarDisponibilidadeModosCliente();
   }catch(erro){
     console.error("Falha ao carregar catálogo cloud:",erro);
     alert("Não foi possível carregar o cardápio online. Verifique sua internet e tente novamente.");
@@ -36,6 +45,21 @@ window.onload=async function(){
 };
 
 window.enviarPedido=async function(){
+  if(!lojaAbertaCliente()){
+    alert(statusLojaCliente.mensagem||"O atendimento está temporariamente pausado.");
+    return;
+  }
+
+  const indisponiveis=carrinho.filter(i=>{
+    if(i.alacarte && i.receitaId)return !produtoDisponivelCliente(i.receitaId);
+    if(i.personalizado && !i.alacarte)return !produtoDisponivelCliente("monte");
+    return false;
+  });
+  if(indisponiveis.length){
+    alert("Um ou mais itens do carrinho ficaram indisponíveis. Remova-os para continuar.");
+    return;
+  }
+
   const nome=document.getElementById("nome").value.trim();
   const telefone=document.getElementById("telefone").value.trim();
   const endereco=document.getElementById("endereco").value.trim();

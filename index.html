@@ -24,6 +24,35 @@
     .dashboard-periodo:after{content:"";height:1px;background:#e4ebe0;flex:1}
   </style>
 
+
+  <style>
+    .controle-loja-v27{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0 0 18px;padding:16px 18px;border:1px solid #dfe8da;border-radius:16px;background:#fff}
+    .controle-loja-v27>div:first-child{display:flex;flex-direction:column;gap:4px}
+    .controle-loja-kicker{font-size:10px;font-weight:900;letter-spacing:.08em;color:#f47b20}
+    #statusLojaAdmin{font-size:17px;color:#155b2a}
+    #statusLojaMensagemAdmin{color:#6d776e}
+    .controle-loja-acoes{display:flex;gap:8px;align-items:center;flex:1;justify-content:flex-end}
+    .controle-loja-acoes input{max-width:340px;width:100%;padding:10px 12px;border:1px solid #d8e1d5;border-radius:10px}
+    .controle-loja-v27.pausada{border-color:#f1b7ad;background:#fff7f5}
+    .controle-loja-v27.pausada #statusLojaAdmin{color:#a93627}
+    .controle-loja-v27.pausada #btnAlternarLoja{background:#1f7a35}
+    .lista-disponibilidade-v27{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .disp-item-v27{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e2e8df;border-radius:12px;padding:11px 12px;background:#fff}
+    .disp-item-v27>div{min-width:0}
+    .disp-item-v27 strong{display:block;color:#17351f}
+    .disp-item-v27 small{display:block;margin-top:3px;color:#7a817b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .disp-status-v27{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:900;margin-top:5px;background:#e7f5e7;color:#176b2c}
+    .disp-item-v27.pausado{background:#fff8f6;border-color:#f2c7be}
+    .disp-item-v27.pausado .disp-status-v27{background:#fde3dd;color:#a33a29}
+    .disp-item-v27 button{white-space:nowrap}
+    @media(max-width:760px){
+      .controle-loja-v27{align-items:stretch;flex-direction:column}
+      .controle-loja-acoes{justify-content:stretch;flex-direction:column}
+      .controle-loja-acoes input,.controle-loja-acoes button{max-width:none;width:100%}
+      .lista-disponibilidade-v27{grid-template-columns:1fr}
+    }
+  </style>
+
 </head>
 <body class="admin-body">
 
@@ -77,6 +106,18 @@
             <span class="section-kicker">VISÃO GERAL</span>
             <h2>Dashboard</h2>
             <p>Acompanhe os principais números e os pedidos mais recentes.</p>
+          </div>
+        </div>
+
+        <div class="controle-loja-v27">
+          <div>
+            <span class="controle-loja-kicker">STATUS DO ATENDIMENTO</span>
+            <strong id="statusLojaAdmin">🟢 Loja aberta para pedidos</strong>
+            <small id="statusLojaMensagemAdmin">Clientes podem finalizar pedidos normalmente.</small>
+          </div>
+          <div class="controle-loja-acoes">
+            <input id="mensagemLojaAdmin" placeholder="Mensagem opcional. Ex.: Voltamos às 18h">
+            <button id="btnAlternarLoja" type="button" onclick="alternarStatusLoja()">Pausar atendimento</button>
           </div>
         </div>
 
@@ -166,6 +207,16 @@
             <strong>🥭 Monte do Seu Jeito</strong>
             <span>Tamanhos, adicionais e ingredientes disponíveis.</span>
           </button>
+        </div>
+
+        <div class="bloco disponibilidade-admin-v27">
+          <div class="bloco-topo">
+            <div>
+              <h3>Disponibilidade do cardápio</h3>
+              <p class="texto-suave">Pause um sabor quando faltar algum ingrediente. O produto permanece cadastrado e pode ser reativado a qualquer momento.</p>
+            </div>
+          </div>
+          <div id="disponibilidadeProdutosAdmin" class="lista-disponibilidade-v27"></div>
         </div>
 
         <div id="produtosCarteAdmin">

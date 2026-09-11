@@ -44,6 +44,8 @@ let pedidos = lerJSON("mangora_pedidos", []);
 let despesas = lerJSON("mangora_despesas", []);
 let materiasPrimas = lerJSON("mangora_materias_primas", []);
 let configuracaoMonte = lerJSON("mangora_config_monte",{base500:5,manga:7,abacaxi:7,kiwi:8,morango:8,tempero:2,leiteCondensado:3,cremeNinho:5,cremeChocolate:5,cremeMaracuja:5,mel:5,iogurte:5});
+let statusLoja = lerJSON("mangora_status_loja",{aberta:true,mensagem:""});
+let disponibilidadeCardapio = lerJSON("mangora_disponibilidade_cardapio",{});
 let carrinho = [];
 
 // Migração leve para pedidos antigos.
@@ -862,6 +864,55 @@ function carregarConfiguracaoMonte(){
 }
 
 
+
+const nomesDisponibilidadeAdmin={
+  classico:"🥭 Mangora Clássico",
+  mexicano:"🌶️ Mangora Mexicano",
+  fresh:"🍋 Mangora Fresh",
+  picante:"🔥 Mangora Picante",
+  tropical:"🥝 Mangora Tropical",
+  tentacao:"🍓 Mangora Tentação",
+  deuses:"👑 Mangora dos Deuses",
+  fit:"🌿 Mangora Fit",
+  paixao:"💛 Mangora Paixão",
+  monte:"🥭 Monte do Seu Jeito"
+};
+
+function renderizarStatusLojaAdmin(){
+  const box=document.querySelector(".controle-loja-v27");
+  const status=document.getElementById("statusLojaAdmin");
+  const msg=document.getElementById("statusLojaMensagemAdmin");
+  const input=document.getElementById("mensagemLojaAdmin");
+  const btn=document.getElementById("btnAlternarLoja");
+  if(!status||!btn)return;
+
+  const aberta=statusLoja?.aberta!==false;
+  box?.classList.toggle("pausada",!aberta);
+  status.textContent=aberta?"🟢 Loja aberta para pedidos":"🔴 Atendimento pausado";
+  msg.textContent=aberta
+    ?"Clientes podem finalizar pedidos normalmente."
+    :(statusLoja.mensagem||"No momento não estamos recebendo novos pedidos.");
+  if(input && document.activeElement!==input)input.value=statusLoja.mensagem||"";
+  btn.textContent=aberta?"Pausar atendimento":"Reabrir atendimento";
+}
+
+function renderizarDisponibilidadeAdmin(){
+  const area=document.getElementById("disponibilidadeProdutosAdmin");
+  if(!area)return;
+  area.innerHTML=Object.entries(nomesDisponibilidadeAdmin).map(([chave,nome])=>{
+    const cfg=disponibilidadeCardapio[chave]||{ativo:true,motivo:""};
+    const ativo=cfg.ativo!==false;
+    return `<div class="disp-item-v27 ${ativo?"":"pausado"}">
+      <div>
+        <strong>${nome}</strong>
+        <span class="disp-status-v27">${ativo?"DISPONÍVEL":"PAUSADO"}</span>
+        <small>${ativo?"Disponível para venda":(cfg.motivo||"Temporariamente indisponível")}</small>
+      </div>
+      <button type="button" class="${ativo?"btn-secundario":""}" onclick="alternarDisponibilidadeProduto('${chave}')">${ativo?"Pausar":"Reativar"}</button>
+    </div>`;
+  }).join("");
+}
+
 const receitasCarteAdmin=[
  ["classico","Mangora Clássico"],["mexicano","Mangora Mexicano"],["fresh","Mangora Fresh"],
  ["picante","Mangora Picante"],["tropical","Mangora Tropical"],["tentacao","Mangora Tentação"],
@@ -1208,6 +1259,8 @@ function atualizarSistema(){
   listarMateriaPrima();
   carregarConfiguracaoMonte();
   renderizarPrecosCarte();
+  renderizarStatusLojaAdmin();
+  renderizarDisponibilidadeAdmin();
   atualizarDashboard();
   atualizarFinanceiro();
 }

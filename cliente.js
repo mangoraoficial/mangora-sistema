@@ -59,6 +59,8 @@ let ultimoPedido = null;
 const TAXA_ENTREGA_MANGORA = 5;
 let tipoRecebimentoCliente = "Delivery";
 const CHAVE_PIX_MANGORA = "43999649635";
+let statusLojaCliente = {aberta:true,mensagem:""};
+let disponibilidadeCliente = {};
 const MONTE_PADRAO={base500:5,manga:7,abacaxi:7,kiwi:8,morango:8,tempero:2,leiteCondensado:3,cremeNinho:5,cremeChocolate:5,cremeMaracuja:5,mel:5,iogurte:5};
 function configMonteAtual(){
  try{return {...MONTE_PADRAO,...(JSON.parse(localStorage.getItem("mangora_config_monte"))||{})};}
@@ -94,6 +96,40 @@ function lerPrecosCarte(){
  try{return JSON.parse(localStorage.getItem("mangora_precos_carte"))||{};}catch(e){return {};}
 }
 
+
+
+function produtoDisponivelCliente(chave){
+  return disponibilidadeCliente?.[chave]?.ativo!==false;
+}
+
+function lojaAbertaCliente(){
+  return statusLojaCliente?.aberta!==false;
+}
+
+function aplicarStatusLojaCliente(){
+  const aviso=document.getElementById("avisoLojaPausada");
+  const texto=document.getElementById("avisoLojaPausadaTexto");
+  const aberta=lojaAbertaCliente();
+
+  if(aviso)aviso.style.display=aberta?"none":"block";
+  if(texto)texto.textContent=statusLojaCliente.mensagem||"No momento não estamos recebendo novos pedidos.";
+
+  const btnFinalizar=document.querySelector('#formPedido button[onclick="enviarPedido()"]');
+  if(btnFinalizar){
+    btnFinalizar.disabled=!aberta;
+    btnFinalizar.textContent=aberta?"Enviar pedido":"Atendimento pausado";
+  }
+}
+
+function aplicarDisponibilidadeModosCliente(){
+  const btnMonte=document.getElementById("btnMonte");
+  const monteAtivo=produtoDisponivelCliente("monte");
+  if(btnMonte){
+    btnMonte.disabled=!monteAtivo;
+    btnMonte.classList.toggle("indisponivel-v27",!monteAtivo);
+    btnMonte.title=monteAtivo?"":(disponibilidadeCliente.monte?.motivo||"Temporariamente indisponível");
+  }
+}
 
 function lerProdutos(){
   try{
@@ -260,14 +296,18 @@ function renderizarCarte(){
  const precos=lerPrecosCarte();
  area.innerHTML=receitasCarte.map(r=>{
    const p400=Number(precos[r.id]?.p400||0), p500=Number(precos[r.id]?.p500||0);
-   return `<article class="produto-carte produto-carte-com-imagem">
+   const ativo=produtoDisponivelCliente(r.id);
+   const motivo=disponibilidadeCliente?.[r.id]?.motivo||"Temporariamente indisponível";
+   return `<article class="produto-carte produto-carte-com-imagem ${ativo?"":"indisponivel-v27"}">
      <div class="produto-carte-imagem-wrap">
        <img class="produto-carte-imagem" src="${imagensCarte[r.id]||''}" alt="${r.nome}" loading="lazy">
      </div>
-     <div class="produto-carte-info"><h3>${r.nome}</h3><p>${r.descricao}</p>
+     <div class="produto-carte-info">
+       ${ativo?"":`<span class="badge-indisponivel-v27">INDISPONÍVEL • ${motivo}</span>`}
+       <h3>${r.nome}</h3><p>${r.descricao}</p>
        <div class="tamanhos-carte">
-         <button onclick="adicionarCarte('${r.id}','400')">400 ml <strong>${p400>0?moeda(p400):"Preço a definir"}</strong></button>
-         <button onclick="adicionarCarte('${r.id}','500')">500 ml <strong>${p500>0?moeda(p500):"Preço a definir"}</strong></button>
+         <button ${ativo?"":"disabled"} onclick="adicionarCarte('${r.id}','400')">400 ml <strong>${p400>0?moeda(p400):"Preço a definir"}</strong></button>
+         <button ${ativo?"":"disabled"} onclick="adicionarCarte('${r.id}','500')">500 ml <strong>${p500>0?moeda(p500):"Preço a definir"}</strong></button>
        </div>
      </div>
    </article>`;
@@ -275,6 +315,10 @@ function renderizarCarte(){
 }
 function adicionarCarte(id,tamanho){
  const r=receitasCarte.find(x=>x.id===id); if(!r)return;
+ if(!produtoDisponivelCliente(id)){
+   alert(disponibilidadeCliente?.[id]?.motivo||"Este produto está temporariamente indisponível.");
+   return;
+ }
  const precos=lerPrecosCarte();
  const valor=Number(tamanho==="500"?precos[id]?.p500||0:precos[id]?.p400||0);
  if(valor<=0){alert("Este tamanho está temporariamente indisponível porque o preço ainda não foi configurado.");return;}
@@ -303,6 +347,10 @@ function adicionarCarte(id,tamanho){
 }
 
 function abrirModo(modo){
+  if(modo==="monte" && !produtoDisponivelCliente("monte")){
+    alert(disponibilidadeCliente?.monte?.motivo||"O Monte do Seu Jeito está temporariamente indisponível.");
+    return;
+  }
   const areaMonte=document.getElementById("areaMonte");
   const areaCarte=document.getElementById("areaCarte");
   const btnMonte=document.getElementById("btnMonte");
@@ -349,6 +397,10 @@ function atualizarResumoMonte(){
   p.textContent=`Total: ${moeda(r.total)}`;
 }
 function adicionarMonteCarrinho(){
+  if(!produtoDisponivelCliente("monte")){
+    alert(disponibilidadeCliente?.monte?.motivo||"O Monte do Seu Jeito está temporariamente indisponível.");
+    return;
+  }
   const r=calcularMonte();
   if(!r.frutas.length){alert("Escolha pelo menos uma fruta para montar seu copo.");return;}
   const detalhes=`Base 500 ml: ${moeda(r.base)} | Frutas: ${r.frutas.join(", ")} | Temperos: ${r.temperos.join(", ")||"sem tempero"} | Caldas e cremes: ${r.coberturas.join(", ")||"sem cobertura"}`;

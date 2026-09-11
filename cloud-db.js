@@ -113,6 +113,46 @@ async function cloudSalvarConfigMonte(c){
   });
 }
 
+
+async function cloudLerStatusLoja(auth=false){
+  const rows=await mangoraRequest("/rest/v1/config_loja?select=id,aberta,mensagem&order=id.asc&limit=1",{auth});
+  const r=rows?.[0];
+  return r ? {aberta:Boolean(r.aberta),mensagem:r.mensagem||""} : {aberta:true,mensagem:""};
+}
+
+async function cloudSalvarStatusLoja(status){
+  return mangoraRequest("/rest/v1/config_loja?on_conflict=id",{
+    method:"POST",auth:true,prefer:"resolution=merge-duplicates,return=minimal",
+    body:[{
+      id:1,
+      aberta:Boolean(status.aberta),
+      mensagem:String(status.mensagem||"").trim()||null,
+      atualizado_em:new Date().toISOString()
+    }]
+  });
+}
+
+async function cloudLerDisponibilidade(auth=false){
+  const rows=await mangoraRequest("/rest/v1/disponibilidade_cardapio?select=chave,ativo,motivo&order=chave.asc",{auth});
+  const mapa={};
+  (rows||[]).forEach(r=>{
+    mapa[r.chave]={ativo:Boolean(r.ativo),motivo:r.motivo||""};
+  });
+  return mapa;
+}
+
+async function cloudSalvarDisponibilidade(chave,ativo,motivo=""){
+  return mangoraRequest("/rest/v1/disponibilidade_cardapio?on_conflict=chave",{
+    method:"POST",auth:true,prefer:"resolution=merge-duplicates,return=minimal",
+    body:[{
+      chave,
+      ativo:Boolean(ativo),
+      motivo:String(motivo||"").trim()||null,
+      atualizado_em:new Date().toISOString()
+    }]
+  });
+}
+
 function pedidoCloudParaLocal(p){
   return {
     id:Number(p.id),

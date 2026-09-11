@@ -58,6 +58,17 @@ body.pedido-concluido-v23 .cliente-main{padding-top:20px}
 .resumo-monte-v24 #precoMonte{display:block;font-size:22px;color:#155b2a;margin:12px 0}
 @media(max-width:600px){.monte-v24-cabecalho{flex-direction:column}.monte-v24-a-partir{white-space:normal}}
 </style>
+
+  <style>
+    .aviso-loja-pausada-v27{position:sticky;top:0;z-index:900;margin:0 auto;padding:13px 18px;text-align:center;background:#fff0eb;border-bottom:1px solid #efc0b6;color:#8d3023}
+    .aviso-loja-pausada-v27 strong{display:block;font-size:15px}
+    .aviso-loja-pausada-v27 span{display:block;margin-top:3px;font-size:12px}
+    .produto-carte.indisponivel-v27{opacity:.66;filter:saturate(.65)}
+    .produto-carte.indisponivel-v27 .tamanhos-carte button{cursor:not-allowed;background:#ecefea!important;color:#7d847e!important;border-color:#d9dfd7!important}
+    .badge-indisponivel-v27{display:inline-flex;margin-bottom:7px;padding:5px 8px;border-radius:999px;background:#fde3dd;color:#9c392a;font-size:10px;font-weight:900}
+    .modo-card.indisponivel-v27{opacity:.6;cursor:not-allowed}
+  </style>
+
 </head>
 <body class="site-cliente">
 
@@ -69,6 +80,11 @@ body.pedido-concluido-v23 .cliente-main{padding-top:20px}
     <h1>Faça seu pedido</h1>
     <p>Escolha seus produtos favoritos e finalize em poucos passos.</p>
   </section>
+
+  <div id="avisoLojaPausada" class="aviso-loja-pausada-v27" style="display:none;">
+    <strong>⏸️ Atendimento temporariamente pausado</strong>
+    <span id="avisoLojaPausadaTexto">No momento não estamos recebendo novos pedidos.</span>
+  </div>
 
   <main class="cliente-main">
 
