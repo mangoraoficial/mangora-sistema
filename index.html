@@ -53,6 +53,16 @@
     }
   </style>
 
+
+  <style>
+    .grupo-disp-monte-v28{margin-top:18px}
+    .grupo-disp-monte-v28 h4{margin:0 0 9px;color:#17351f}
+    .opcao-check.indisponivel-v28{opacity:.55;cursor:not-allowed;background:#f5f5f3!important}
+    .opcao-check.indisponivel-v28 input{cursor:not-allowed}
+    .opcao-check .aviso-item-pausado-v28{display:block;font-size:10px;font-weight:900;color:#a33a29;margin-top:3px}
+    .chips-manual label.indisponivel-v28{opacity:.5;text-decoration:line-through;cursor:not-allowed}
+  </style>
+
 </head>
 <body class="admin-body">
 
@@ -273,6 +283,26 @@
             <div class="card"><span>Tamanho</span><strong>500 ml</strong></div>
             <div class="card laranja"><span>Fruta obrigatória</span><strong>Mínimo 1</strong></div>
             <div class="card amarelo"><span>Ingredientes</span><strong>Livres</strong></div>
+          </div>
+
+          <div class="bloco">
+            <h3>Disponibilidade dos itens do Monte do Seu Jeito</h3>
+            <p class="texto-suave">Pause somente o ingrediente que estiver em falta. Os demais continuam disponíveis normalmente.</p>
+
+            <div class="grupo-disp-monte-v28">
+              <h4>🍓 Frutas</h4>
+              <div id="dispMonteFrutas" class="lista-disponibilidade-v27"></div>
+            </div>
+
+            <div class="grupo-disp-monte-v28">
+              <h4>🌶️ Temperos</h4>
+              <div id="dispMonteTemperos" class="lista-disponibilidade-v27"></div>
+            </div>
+
+            <div class="grupo-disp-monte-v28">
+              <h4>🥛 Caldas e cremes</h4>
+              <div id="dispMonteCoberturas" class="lista-disponibilidade-v27"></div>
+            </div>
           </div>
         </div>
       </section>

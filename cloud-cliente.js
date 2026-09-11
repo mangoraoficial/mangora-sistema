@@ -103,7 +103,12 @@ window.enviarPedido=async function(){
     quantidade:Number(i.quantidade||1),
     total:Number(i.total||0),
     personalizado:Boolean(i.personalizado),
-    alacarte:Boolean(i.alacarte)
+    alacarte:Boolean(i.alacarte),
+    ingredientes:(i.personalizado && !i.alacarte && i.montagem) ? [
+      ...(i.montagem.frutas||[]).map(n=>chaveItemMonteCliente("frutas",n)),
+      ...(i.montagem.temperos||[]).map(n=>chaveItemMonteCliente("temperos",n)),
+      ...(i.montagem.coberturas||[]).map(n=>chaveItemMonteCliente("coberturas",n))
+    ].filter(Boolean) : []
   }));
 
   try{

@@ -364,6 +364,34 @@ function abrirModo(modo){
   if(btnMonte) btnMonte.classList.toggle("ativo", mostrarMonte);
   if(btnCarte) btnCarte.classList.toggle("ativo", !mostrarMonte);
 }
+
+function chaveItemMonteCliente(grupo,nome){
+  const mapas={
+    frutas:{
+      "Manga":"monte_fruta_manga","Abacaxi":"monte_fruta_abacaxi","Kiwi":"monte_fruta_kiwi","Morango":"monte_fruta_morango"
+    },
+    temperos:{
+      "Chamoy":"monte_tempero_chamoy","Tajín":"monte_tempero_tajin","Limão":"monte_tempero_limao","Pimenta em pó":"monte_tempero_pimenta_po",
+      "Sal rosa":"monte_tempero_sal_rosa","Lemon Pepper":"monte_tempero_lemon_pepper","Páprica doce":"monte_tempero_paprica_doce","Páprica picante":"monte_tempero_paprica_picante"
+    },
+    coberturas:{
+      "Leite condensado":"monte_cob_leite_condensado","Creme Ninho":"monte_cob_creme_ninho","Creme de chocolate":"monte_cob_creme_chocolate",
+      "Creme de maracujá":"monte_cob_creme_maracuja","Mel":"monte_cob_mel","Iogurte natural":"monte_cob_iogurte_natural"
+    }
+  };
+  return mapas[grupo]?.[nome]||"";
+}
+
+function itemMonteDisponivelCliente(grupo,nome){
+  const chave=chaveItemMonteCliente(grupo,nome);
+  return !chave || disponibilidadeCliente?.[chave]?.ativo!==false;
+}
+
+function motivoItemMonteCliente(grupo,nome){
+  const chave=chaveItemMonteCliente(grupo,nome);
+  return disponibilidadeCliente?.[chave]?.motivo||"Indisponível no momento";
+}
+
 function precoItemMonteV24(grupo,nome){
  const c=configMonteAtual();
  if(grupo==="frutas")return Number({"Manga":c.manga,"Abacaxi":c.abacaxi,"Kiwi":c.kiwi,"Morango":c.morango}[nome]||0);
@@ -374,7 +402,12 @@ function renderizarGrupo(id,g,itens){
   const area=document.getElementById(id); if(!area)return;
   area.innerHTML=itens.map(n=>{
     const valor=precoItemMonteV24(g,n);
-    return `<label class="opcao-check"><input type="checkbox" data-grupo="${g}" value="${n}" onchange="atualizarResumoMonte()"><span><span>${n}</span><b class="preco-adicional-v24">+ ${moeda(valor)}</b></span></label>`;
+    const ativo=itemMonteDisponivelCliente(g,n);
+    const motivo=motivoItemMonteCliente(g,n);
+    return `<label class="opcao-check ${ativo?"":"indisponivel-v28"}" title="${ativo?"":motivo}">
+      <input type="checkbox" data-grupo="${g}" value="${n}" ${ativo?"":"disabled"} onchange="atualizarResumoMonte()">
+      <span><span>${n}${ativo?"":`<small class="aviso-item-pausado-v28">Indisponível</small>`}</span><b class="preco-adicional-v24">+ ${moeda(valor)}</b></span>
+    </label>`;
   }).join("");
 }
 function renderizarOpcoesMonte(){
@@ -402,6 +435,20 @@ function adicionarMonteCarrinho(){
     return;
   }
   const r=calcularMonte();
+
+  const indisponiveis=[
+    ...r.frutas.map(n=>["frutas",n]),
+    ...r.temperos.map(n=>["temperos",n]),
+    ...r.coberturas.map(n=>["coberturas",n])
+  ].filter(([g,n])=>!itemMonteDisponivelCliente(g,n));
+
+  if(indisponiveis.length){
+    alert(`O item ${indisponiveis[0][1]} ficou indisponível. Atualize sua montagem para continuar.`);
+    renderizarOpcoesMonte();
+    atualizarResumoMonte();
+    return;
+  }
+
   if(!r.frutas.length){alert("Escolha pelo menos uma fruta para montar seu copo.");return;}
   const detalhes=`Base 500 ml: ${moeda(r.base)} | Frutas: ${r.frutas.join(", ")} | Temperos: ${r.temperos.join(", ")||"sem tempero"} | Caldas e cremes: ${r.coberturas.join(", ")||"sem cobertura"}`;
   carrinho.push({id:Date.now(),produtoId:null,nome:"Monte do Seu Jeito - 500 ml",detalhes,preco:r.total,quantidade:1,total:r.total,personalizado:true,montagem:r});

@@ -45,6 +45,7 @@ async function sincronizarCatalogoCloudAdmin(){
   renderizarPedidoManual();
   renderizarStatusLojaAdmin();
   renderizarDisponibilidadeAdmin();
+  renderizarDisponibilidadeItensMonteAdmin();
 }
 
 async function ativarAlertasPedidos(){
@@ -156,7 +157,7 @@ window.alternarDisponibilidadeProduto=async function(chave){
 
   let motivo="";
   if(!novoAtivo){
-    const nome=nomesDisponibilidadeAdmin[chave]||chave;
+    const nome=nomesDisponibilidadeAdmin[chave]||nomesItensMonteAdmin[chave]||chave;
     const informado=prompt(`Pausar ${nome}?\n\nMotivo opcional:`,atual.motivo||"");
     if(informado===null)return;
     motivo=informado.trim();
@@ -167,6 +168,7 @@ window.alternarDisponibilidadeProduto=async function(chave){
     disponibilidadeCardapio[chave]={ativo:novoAtivo,motivo};
     localStorage.setItem("mangora_disponibilidade_cardapio",JSON.stringify(disponibilidadeCardapio));
     renderizarDisponibilidadeAdmin();
+    renderizarDisponibilidadeItensMonteAdmin();
     renderizarPedidoManual();
   }catch(erro){
     alert(`Não foi possível alterar a disponibilidade.\n\n${erro.message}`);
@@ -262,7 +264,12 @@ window.finalizarPedido=async function(){
     quantidade:Number(i.quantidade||1),
     total:Number(i.total||0),
     personalizado:Boolean(i.personalizado),
-    alacarte:Boolean(i.alacarte)
+    alacarte:Boolean(i.alacarte),
+    ingredientes:(i.personalizado && !i.alacarte && i.montagem) ? [
+      ...(i.montagem.frutas||[]).map(chaveItemMonteAdmin),
+      ...(i.montagem.temperos||[]).map(chaveItemMonteAdmin),
+      ...(i.montagem.coberturas||[]).map(chaveItemMonteAdmin)
+    ].filter(Boolean) : []
   }));
 
   try{

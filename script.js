@@ -539,7 +539,11 @@ function renderizarPedidoManual(){
  <button onclick="adicionarCarteManual('${id}','500')">500 ml<br><small>${Number(precos[id]?.p500||0)>0?moeda(precos[id].p500):"Preço a definir"}</small></button>
  </div></article>`).join("");
  [["manualFrutas",opcoesManual.frutas],["manualTemperos",opcoesManual.temperos],["manualCoberturas",opcoesManual.coberturas]].forEach(([id,arr])=>{
-  const el=document.getElementById(id); if(el) el.innerHTML=arr.map(v=>`<label><input type="checkbox" value="${v}" onchange="calcularMonteManual()"> ${v}</label>`).join("");
+  const el=document.getElementById(id);
+  if(el) el.innerHTML=arr.map(v=>{
+    const ativo=itemMonteDisponivelAdmin(v);
+    return `<label class="${ativo?"":"indisponivel-v28"}"><input type="checkbox" value="${v}" ${ativo?"":"disabled"} onchange="calcularMonteManual()"> ${v}${ativo?"":" — indisponível"}</label>`;
+  }).join("");
  });
  calcularMonteManual();
 }
@@ -865,6 +869,41 @@ function carregarConfiguracaoMonte(){
 
 
 
+
+const itensMonteDisponibilidadeAdmin={
+  frutas:{
+    monte_fruta_manga:"🥭 Manga",
+    monte_fruta_abacaxi:"🍍 Abacaxi",
+    monte_fruta_kiwi:"🥝 Kiwi",
+    monte_fruta_morango:"🍓 Morango"
+  },
+  temperos:{
+    monte_tempero_chamoy:"Chamoy",
+    monte_tempero_tajin:"Tajín",
+    monte_tempero_limao:"Limão",
+    monte_tempero_pimenta_po:"Pimenta em pó",
+    monte_tempero_sal_rosa:"Sal rosa",
+    monte_tempero_lemon_pepper:"Lemon Pepper",
+    monte_tempero_paprica_doce:"Páprica doce",
+    monte_tempero_paprica_picante:"Páprica picante"
+  },
+  coberturas:{
+    monte_cob_leite_condensado:"Leite condensado",
+    monte_cob_creme_ninho:"Creme Ninho",
+    monte_cob_creme_chocolate:"Creme de chocolate",
+    monte_cob_creme_maracuja:"Creme de maracujá",
+    monte_cob_mel:"Mel",
+    monte_cob_iogurte_natural:"Iogurte natural"
+  }
+};
+
+const nomesItensMonteAdmin=Object.assign(
+  {},
+  itensMonteDisponibilidadeAdmin.frutas,
+  itensMonteDisponibilidadeAdmin.temperos,
+  itensMonteDisponibilidadeAdmin.coberturas
+);
+
 const nomesDisponibilidadeAdmin={
   classico:"🥭 Mangora Clássico",
   mexicano:"🌶️ Mangora Mexicano",
@@ -912,6 +951,46 @@ function renderizarDisponibilidadeAdmin(){
     </div>`;
   }).join("");
 }
+
+function montarListaDisponibilidadeMonte(areaId,mapa){
+  const area=document.getElementById(areaId);
+  if(!area)return;
+  area.innerHTML=Object.entries(mapa).map(([chave,nome])=>{
+    const cfg=disponibilidadeCardapio[chave]||{ativo:true,motivo:""};
+    const ativo=cfg.ativo!==false;
+    return `<div class="disp-item-v27 ${ativo?"":"pausado"}">
+      <div>
+        <strong>${nome}</strong>
+        <span class="disp-status-v27">${ativo?"DISPONÍVEL":"PAUSADO"}</span>
+        <small>${ativo?"Disponível no Monte do Seu Jeito":(cfg.motivo||"Temporariamente indisponível")}</small>
+      </div>
+      <button type="button" class="${ativo?"btn-secundario":""}" onclick="alternarDisponibilidadeProduto('${chave}')">${ativo?"Pausar":"Reativar"}</button>
+    </div>`;
+  }).join("");
+}
+
+function renderizarDisponibilidadeItensMonteAdmin(){
+  montarListaDisponibilidadeMonte("dispMonteFrutas",itensMonteDisponibilidadeAdmin.frutas);
+  montarListaDisponibilidadeMonte("dispMonteTemperos",itensMonteDisponibilidadeAdmin.temperos);
+  montarListaDisponibilidadeMonte("dispMonteCoberturas",itensMonteDisponibilidadeAdmin.coberturas);
+}
+
+function chaveItemMonteAdmin(valor){
+  const mapa={
+    "Manga":"monte_fruta_manga","Abacaxi":"monte_fruta_abacaxi","Kiwi":"monte_fruta_kiwi","Morango":"monte_fruta_morango",
+    "Chamoy":"monte_tempero_chamoy","Tajín":"monte_tempero_tajin","Limão":"monte_tempero_limao","Pimenta em pó":"monte_tempero_pimenta_po",
+    "Sal rosa":"monte_tempero_sal_rosa","Lemon Pepper":"monte_tempero_lemon_pepper","Páprica doce":"monte_tempero_paprica_doce","Páprica picante":"monte_tempero_paprica_picante",
+    "Leite condensado":"monte_cob_leite_condensado","Creme Ninho":"monte_cob_creme_ninho","Creme de chocolate":"monte_cob_creme_chocolate",
+    "Creme de maracujá":"monte_cob_creme_maracuja","Mel":"monte_cob_mel","Iogurte natural":"monte_cob_iogurte_natural"
+  };
+  return mapa[valor]||"";
+}
+
+function itemMonteDisponivelAdmin(valor){
+  const chave=chaveItemMonteAdmin(valor);
+  return !chave || disponibilidadeCardapio[chave]?.ativo!==false;
+}
+
 
 const receitasCarteAdmin=[
  ["classico","Mangora Clássico"],["mexicano","Mangora Mexicano"],["fresh","Mangora Fresh"],
@@ -1261,6 +1340,7 @@ function atualizarSistema(){
   renderizarPrecosCarte();
   renderizarStatusLojaAdmin();
   renderizarDisponibilidadeAdmin();
+  renderizarDisponibilidadeItensMonteAdmin();
   atualizarDashboard();
   atualizarFinanceiro();
 }
