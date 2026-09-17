@@ -920,6 +920,13 @@ const nomesDisponibilidadeAdmin={
   deuses:"👑 Mangora dos Deuses",
   fit:"🌿 Mangora Fit",
   paixao:"💛 Mangora Paixão",
+
+  paraiso:"✨ Mangora Paraíso",
+  brasa:"🔥 Mangora Brasa",
+  rubi:"💗 Mangora Rubi",
+  explosao:"💥 Mangora Explosão",
+  ousadia:"🌶️ Mangora Ousadia",
+
   monte:"🥭 Monte do Seu Jeito"
 };
 
