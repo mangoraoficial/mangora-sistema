@@ -77,7 +77,12 @@ const receitasCarte=[
  {id:"tentacao",nome:"Mangora Tentação",emoji:"🍓",descricao:"Morango + creme Ninho + creme de chocolate"},
  {id:"deuses",nome:"Mangora dos Deuses",emoji:"👑",descricao:"Manga + morango + kiwi + creme Ninho + creme de chocolate"},
  {id:"fit",nome:"Mangora Fit",emoji:"🌿",descricao:"Morango + kiwi + manga + iogurte natural + mel"},
- {id:"paixao",nome:"Mangora Paixão",emoji:"💛",descricao:"Morango + kiwi + manga + creme de maracujá"}
+ {id:"paixao",nome:"Mangora Paixão",emoji:"💛",descricao:"Morango + kiwi + manga + creme de maracujá"},
+ {id:"paraiso",nome:"Mangora Paraíso",emoji:"🌴",descricao:"Manga + melancia + abacaxi",lancamento:true},
+ {id:"brasa",nome:"Mangora Brasa",emoji:"🔥",descricao:"Abacaxi + Lemon Pepper + limão + sal + pimenta preta",lancamento:true},
+ {id:"rubi",nome:"Mangora Rubi",emoji:"🍉",descricao:"Melancia + Tajín + limão + pimenta",lancamento:true},
+ {id:"explosao",nome:"Mangora Explosão",emoji:"💥",descricao:"Manga + abacaxi + melancia + sal + Lemon Pepper + páprica doce + limão + pimenta + leite condensado",lancamento:true},
+ {id:"ousadia",nome:"Mangora Ousadia",emoji:"🌶️",descricao:"Abacaxi + kiwi + morango + uva + Lemon Pepper + limão + sal + páprica picante + leite condensado",lancamento:true}
 ];
 
 const imagensCarte={
@@ -89,7 +94,12 @@ const imagensCarte={
  tentacao:"img/produtos/tentacao.webp",
  deuses:"img/produtos/deuses.webp",
  fit:"img/produtos/fit.webp",
- paixao:"img/produtos/paixao.webp"
+ paixao:"img/produtos/paixao.webp",
+ paraiso:"img/produtos/paraiso.webp",
+ brasa:"img/produtos/brasa.webp",
+ rubi:"img/produtos/rubi.webp",
+ explosao:"img/produtos/explosao.webp",
+ ousadia:"img/produtos/ousadia.webp"
 };
 
 function lerPrecosCarte(){
@@ -303,6 +313,7 @@ function renderizarCarte(){
        <img class="produto-carte-imagem" src="${imagensCarte[r.id]||''}" alt="${r.nome}" loading="lazy">
      </div>
      <div class="produto-carte-info">
+       ${r.lancamento?`<span class="badge-lancamento-v29">✨ LANÇAMENTO</span>`:""}
        ${ativo?"":`<span class="badge-indisponivel-v27">INDISPONÍVEL • ${motivo}</span>`}
        <h3>${r.nome}</h3><p>${r.descricao}</p>
        <div class="tamanhos-carte">
