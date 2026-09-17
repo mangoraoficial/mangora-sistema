@@ -506,10 +506,10 @@ const receitasManual=[
  ["paixao","💛 Mangora Paixão","Morango + kiwi + manga + creme de maracujá"],
 
  ["paraiso","✨ Mangora Paraíso","Manga + melancia + abacaxi"],
- ["brasa","🔥 Mangora Brasa","Abacaxi + Lemon Pepper + limão + sal + pimenta preta"],
- ["rubi","❤️ Mangora Rubi","Melancia + Tajín + limão + pimenta"],
- ["explosao","💥 Mangora Explosão","Melancia + manga + limão + Lemon Pepper + pimenta"],
- ["ousadia","🌶️ Mangora Ousadia","Manga + melancia + Tajín + limão + pimenta"]
+["brasa","🔥 Mangora Brasa","Abacaxi + Lemon Pepper + limão + sal + pimenta preta"],
+["rubi","💗 Mangora Rubi","Melancia + Tajín + limão + pimenta"],
+["explosao","💥 Mangora Explosão","Manga + abacaxi + melancia + sal + Lemon Pepper + páprica doce + limão + pimenta + leite condensado"],
+["ousadia","🌶️ Mangora Ousadia","Abacaxi + kiwi + morango + uva + Lemon Pepper + limão + sal + páprica picante + leite condensado"]
 ];
 const opcoesManual={
  frutas:["Manga","Abacaxi","Morango","Kiwi"],
