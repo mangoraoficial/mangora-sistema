@@ -503,7 +503,13 @@ const receitasManual=[
  ["tentacao","🍓 Mangora Tentação","Morango + creme Ninho + creme de chocolate"],
  ["deuses","👑 Mangora dos Deuses","Manga + morango + kiwi + creme Ninho + creme de chocolate"],
  ["fit","🌿 Mangora Fit","Morango + kiwi + manga + iogurte natural + mel"],
- ["paixao","💛 Mangora Paixão","Morango + kiwi + manga + creme de maracujá"]
+ ["paixao","💛 Mangora Paixão","Morango + kiwi + manga + creme de maracujá"],
+
+ ["paraiso","✨ Mangora Paraíso","Manga + melancia + abacaxi"],
+ ["brasa","🔥 Mangora Brasa","Abacaxi + Lemon Pepper + limão + sal + pimenta preta"],
+ ["rubi","❤️ Mangora Rubi","Melancia + Tajín + limão + pimenta"],
+ ["explosao","💥 Mangora Explosão","Melancia + manga + limão + Lemon Pepper + pimenta"],
+ ["ousadia","🌶️ Mangora Ousadia","Manga + melancia + Tajín + limão + pimenta"]
 ];
 const opcoesManual={
  frutas:["Manga","Abacaxi","Morango","Kiwi"],
@@ -993,9 +999,20 @@ function itemMonteDisponivelAdmin(valor){
 
 
 const receitasCarteAdmin=[
- ["classico","Mangora Clássico"],["mexicano","Mangora Mexicano"],["fresh","Mangora Fresh"],
- ["picante","Mangora Picante"],["tropical","Mangora Tropical"],["tentacao","Mangora Tentação"],
- ["deuses","Mangora dos Deuses"],["fit","Mangora Fit"],["paixao","Mangora Paixão"]
+ ["classico","Mangora Clássico"],
+ ["mexicano","Mangora Mexicano"],
+ ["fresh","Mangora Fresh"],
+ ["picante","Mangora Picante"],
+ ["tropical","Mangora Tropical"],
+ ["tentacao","Mangora Tentação"],
+ ["deuses","Mangora dos Deuses"],
+ ["fit","Mangora Fit"],
+ ["paixao","Mangora Paixão"],
+ ["paraiso","✨ Mangora Paraíso"],
+ ["brasa","🔥 Mangora Brasa"],
+ ["rubi","💎 Mangora Rubi"],
+ ["explosao","💥 Mangora Explosão"],
+ ["ousadia","🌶️ Mangora Ousadia"]
 ];
 function renderizarPrecosCarte(){
  const a=document.getElementById("precosCarteAdmin"); if(!a)return;
