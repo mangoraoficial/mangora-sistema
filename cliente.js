@@ -61,12 +61,12 @@ let tipoRecebimentoCliente = "Delivery";
 const CHAVE_PIX_MANGORA = "43999649635";
 let statusLojaCliente = {aberta:true,mensagem:""};
 let disponibilidadeCliente = {};
-const MONTE_PADRAO={base500:5,manga:7,abacaxi:7,kiwi:8,morango:8,tempero:2,leiteCondensado:3,cremeNinho:5,cremeChocolate:5,cremeMaracuja:5,mel:5,iogurte:5};
+const MONTE_PADRAO={base500:5,manga:7,abacaxi:7,kiwi:8,morango:8,melancia:10,uva:10,tempero:2,leiteCondensado:3,cremeNinho:5,cremeChocolate:5,cremeMaracuja:5,mel:5,iogurte:5};
 function configMonteAtual(){
  try{return {...MONTE_PADRAO,...(JSON.parse(localStorage.getItem("mangora_config_monte"))||{})};}
  catch(e){return {...MONTE_PADRAO};}
 }
-const opcoesMonte={frutas:["Manga","Abacaxi","Morango","Kiwi"],temperos:["Chamoy","Tajín","Limão","Pimenta em pó","Sal rosa","Lemon Pepper","Páprica doce","Páprica picante"],coberturas:["Leite condensado","Mel","Creme Ninho","Iogurte natural","Creme de chocolate","Creme de maracujá"]};
+const opcoesMonte={frutas:["Manga","Abacaxi","Morango","Kiwi","Melancia","Uva"],temperos:["Chamoy","Tajín","Limão","Pimenta em pó","Sal rosa","Lemon Pepper","Páprica doce","Páprica picante"],coberturas:["Leite condensado","Mel","Creme Ninho","Iogurte natural","Creme de chocolate","Creme de maracujá"]};
 function lerConfigMonte(){try{return JSON.parse(localStorage.getItem("mangora_config_monte"))||{preco400:0,preco500:0,adicionalFruta:0,adicionalTempero:0,adicionalCobertura:0};}catch(e){return {preco400:0,preco500:0,adicionalFruta:0,adicionalTempero:0,adicionalCobertura:0};}}
 const receitasCarte=[
  {id:"classico",nome:"Mangora Clássico",emoji:"🥭",descricao:"Manga + limão + sal rosa"},
@@ -405,7 +405,7 @@ function motivoItemMonteCliente(grupo,nome){
 
 function precoItemMonteV24(grupo,nome){
  const c=configMonteAtual();
- if(grupo==="frutas")return Number({"Manga":c.manga,"Abacaxi":c.abacaxi,"Kiwi":c.kiwi,"Morango":c.morango}[nome]||0);
+ if(grupo==="frutas")return Number({"Manga":c.manga,"Abacaxi":c.abacaxi,"Kiwi":c.kiwi,"Morango":c.morango,"Melancia":c.melancia,"Uva":c.uva}[nome]||0);
  if(grupo==="temperos")return Number(c.tempero||0);
  return Number({"Leite condensado":c.leiteCondensado,"Creme Ninho":c.cremeNinho,"Creme de chocolate":c.cremeChocolate,"Creme de maracujá":c.cremeMaracuja,"Mel":c.mel,"Iogurte natural":c.iogurte}[nome]||0);
 }
