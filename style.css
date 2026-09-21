@@ -2308,3 +2308,154 @@ tbody tr:hover{
 .status-cloud.offline::before{
   background:#d84a4a;
 }
+
+/* =========================================================
+   CORREÇÃO DE LAYOUT - PAINEL MANGORA
+   Evita cabeçalho empurrando as telas para fora da página
+   ========================================================= */
+
+.admin-body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+.app-shell{
+  width:auto !important;
+  max-width:none !important;
+  margin-left:238px !important;
+  min-width:0 !important;
+  flex:1 1 auto !important;
+  overflow-x:hidden;
+}
+
+.topbar{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+
+  flex-wrap:wrap !important;
+  gap:14px !important;
+
+  box-sizing:border-box !important;
+}
+
+.topbar-copy{
+  flex:1 1 180px !important;
+  min-width:160px !important;
+  max-width:280px;
+}
+
+.topbar-actions{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+
+  flex:1 1 500px !important;
+  min-width:0 !important;
+
+  flex-wrap:wrap !important;
+  gap:10px !important;
+}
+
+.topbar-actions > *{
+  flex-shrink:0;
+}
+
+main{
+  width:calc(100% - 48px) !important;
+  max-width:1480px !important;
+  min-width:0 !important;
+
+  margin:24px auto 34px !important;
+  box-sizing:border-box !important;
+}
+
+.tela{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+}
+
+.bloco{
+  max-width:100%;
+  min-width:0;
+}
+
+.tabela-wrap{
+  width:100%;
+  max-width:100%;
+  overflow-x:auto;
+}
+
+
+/* TABLET */
+@media(max-width:850px) and (min-width:681px){
+
+  .app-shell{
+    margin-left:205px !important;
+  }
+
+  .topbar{
+    align-items:flex-start !important;
+  }
+
+  .topbar-copy{
+    max-width:none;
+  }
+
+  .topbar-actions{
+    flex-basis:100% !important;
+    justify-content:flex-start !important;
+  }
+
+  main{
+    width:calc(100% - 32px) !important;
+  }
+}
+
+
+/* CELULAR */
+@media(max-width:680px){
+
+  .admin-body{
+    display:block !important;
+  }
+
+  .sidebar{
+    position:relative !important;
+    width:100% !important;
+    min-height:auto !important;
+  }
+
+  .app-shell{
+    width:100% !important;
+    margin-left:0 !important;
+  }
+
+  .topbar{
+    position:relative !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+  }
+
+  .topbar-copy{
+    width:100%;
+    max-width:none;
+  }
+
+  .topbar-actions{
+    width:100% !important;
+    flex:0 0 auto !important;
+    justify-content:flex-start !important;
+  }
+
+  main{
+    width:92% !important;
+    margin:18px auto 28px !important;
+  }
+}
