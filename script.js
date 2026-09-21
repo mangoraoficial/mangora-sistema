@@ -564,7 +564,7 @@ function adicionarCarteManual(id,tamanho){
  mostrarCarrinho();
 }
 function valoresMonteManual(){
- const cfg=lerJSON("mangora_config_monte",{base500:5,manga:7,abacaxi:7,kiwi:8,morango:8,tempero:2,leiteCondensado:3,cremeNinho:5,cremeChocolate:5,cremeMaracuja:5,mel:5,iogurte:5});
+ const cfg=lerJSON("mangora_config_monte",{base500:5,manga:7,abacaxi:7,kiwi:8,morango:8,melancia:10,uva:10,tempero:2,leiteCondensado:3,cremeNinho:5,cremeChocolate:5,cremeMaracuja:5,mel:5,iogurte:5});
  const vals=id=>[...document.querySelectorAll(`#${id} input:checked`)].map(x=>x.value);
  const frutas=vals("manualFrutas"),temperos=vals("manualTemperos"),coberturas=vals("manualCoberturas");
  const pf={"Manga":cfg.manga,"Abacaxi":cfg.abacaxi,"Kiwi":cfg.kiwi,"Morango":cfg.morango,"Melancia":cfg.melancia,"Uva":cfg.uva};
