@@ -567,7 +567,7 @@ function valoresMonteManual(){
  const cfg=lerJSON("mangora_config_monte",{base500:5,manga:7,abacaxi:7,kiwi:8,morango:8,tempero:2,leiteCondensado:3,cremeNinho:5,cremeChocolate:5,cremeMaracuja:5,mel:5,iogurte:5});
  const vals=id=>[...document.querySelectorAll(`#${id} input:checked`)].map(x=>x.value);
  const frutas=vals("manualFrutas"),temperos=vals("manualTemperos"),coberturas=vals("manualCoberturas");
- const pf={"Manga":cfg.manga,"Abacaxi":cfg.abacaxi,"Kiwi":cfg.kiwi,"Morango":cfg.morango};
+ const pf={"Manga":cfg.manga,"Abacaxi":cfg.abacaxi,"Kiwi":cfg.kiwi,"Morango":cfg.morango,"Melancia":cfg.melancia,"Uva":cfg.uva};
  const pc={"Leite condensado":cfg.leiteCondensado,"Creme Ninho":cfg.cremeNinho,"Creme de chocolate":cfg.cremeChocolate,"Creme de maracujá":cfg.cremeMaracuja,"Mel":cfg.mel,"Iogurte natural":cfg.iogurte};
  const total=Number(cfg.base500||0)+frutas.reduce((t,n)=>t+Number(pf[n]||0),0)+temperos.length*Number(cfg.tempero||0)+coberturas.reduce((t,n)=>t+Number(pc[n]||0),0);
  return {tamanho:"500",frutas,temperos,coberturas,base:Number(cfg.base500||0),total};
@@ -858,6 +858,8 @@ function salvarConfiguracaoMonte(){
   abacaxi:Number(document.getElementById("monteAbacaxi").value||0),
   kiwi:Number(document.getElementById("monteKiwi").value||0),
   morango:Number(document.getElementById("monteMorango").value||0),
+  melancia:Number(document.getElementById("monteMelancia").value||0),
+  uva:Number(document.getElementById("monteUva").value||0), 
   tempero:Number(document.getElementById("monteTempero").value||0),
   leiteCondensado:Number(document.getElementById("monteLeiteCondensado").value||0),
   cremeNinho:Number(document.getElementById("monteCremeNinho").value||0),
@@ -869,7 +871,8 @@ function salvarConfiguracaoMonte(){
  localStorage.setItem("mangora_config_monte",JSON.stringify(configuracaoMonte));alert("Configuração salva.");
 }
 function carregarConfiguracaoMonte(){
- const mapa={monteBase500:"base500",monteManga:"manga",monteAbacaxi:"abacaxi",monteKiwi:"kiwi",monteMorango:"morango",monteTempero:"tempero",monteLeiteCondensado:"leiteCondensado",monteCremeNinho:"cremeNinho",monteCremeChocolate:"cremeChocolate",monteCremeMaracuja:"cremeMaracuja",monteMel:"mel",monteIogurte:"iogurte"};
+ const mapa={monteBase500:"base500",monteManga:"manga",monteAbacaxi:"abacaxi",monteKiwi:"kiwi",monteMorango:"morango",monteMelancia:"melancia",
+monteUva:"uva", monteTempero:"tempero",monteLeiteCondensado:"leiteCondensado",monteCremeNinho:"cremeNinho",monteCremeChocolate:"cremeChocolate",monteCremeMaracuja:"cremeMaracuja",monteMel:"mel",monteIogurte:"iogurte"};
  Object.entries(mapa).forEach(([id,chave])=>{const e=document.getElementById(id);if(e)e.value=Number(configuracaoMonte[chave]||0)||"";});
 }
 
@@ -881,8 +884,11 @@ const itensMonteDisponibilidadeAdmin={
     monte_fruta_manga:"🥭 Manga",
     monte_fruta_abacaxi:"🍍 Abacaxi",
     monte_fruta_kiwi:"🥝 Kiwi",
-    monte_fruta_morango:"🍓 Morango"
+    monte_fruta_morango:"🍓 Morango",
+    monte_fruta_melancia:"🍉 Melancia",
+    monte_fruta_uva:"🍇 Uva"
   },
+  
   temperos:{
     monte_tempero_chamoy:"Chamoy",
     monte_tempero_tajin:"Tajín",
