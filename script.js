@@ -512,7 +512,7 @@ const receitasManual=[
 ["ousadia","🌶️ Mangora Ousadia","Abacaxi + kiwi + morango + uva + Lemon Pepper + limão + sal + páprica picante + leite condensado"]
 ];
 const opcoesManual={
- frutas:["Manga","Abacaxi","Morango","Kiwi"],
+ frutas:["Manga","Abacaxi","Morango","Kiwi","Melancia","Uva"],
  temperos:["Chamoy","Tajín","Limão","Pimenta em pó","Sal rosa","Lemon Pepper","Páprica doce","Páprica picante"],
  coberturas:["Leite condensado","Mel","Creme Ninho","Iogurte natural","Creme de chocolate","Creme de maracujá"]
 };
